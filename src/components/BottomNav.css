@@ -47,7 +47,9 @@
 }
 
 .bottom-nav__icon {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
   transition: transform var(--duration-fast) var(--ease-spring);
 }
