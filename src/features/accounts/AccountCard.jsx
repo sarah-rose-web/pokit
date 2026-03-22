@@ -26,26 +26,23 @@ function Contactless() {
   )
 }
 
-/** Light-background skins don't invert their logo */
 const LIGHT_BG_SKINS = new Set(['generic-light', 'generic-gold'])
 
 /**
  * Card in the wallet stack or grid.
- *
- * Hover  → lifts (React-state, NOT CSS :hover — avoids z-index wars)
- * Click  → "opens" card (bigger lift + ring + hint)
- * Click again while opened → parent fires drawer
+ * - Stack hover: CSS translateY(-8px) — works cleanly with uniform z-index
+ * - Click: toggles `expanded` class (passed from parent as isExpanded)
+ * - Expanded: card pops to front, transactions panel slides in below card content
  *
  * @param {{
- *   account:       import('@/store/accountsStore').Account,
- *   hovered:       boolean,
- *   opened:        boolean,
- *   dimmed:        boolean,
- *   onSelect:      (account: import('@/store/accountsStore').Account) => void,
- *   onHoverChange: (id: string | null) => void,
+ *   account:    import('@/store/accountsStore').Account,
+ *   isExpanded: boolean,
+ *   onSelect:   (account: import('@/store/accountsStore').Account) => void,
+ *   onEdit:     (account: import('@/store/accountsStore').Account) => void,
+ *   onDelete:   (id: string) => void,
  * }} props
  */
-export default function AccountCard({ account, hovered, opened, dimmed, onSelect, onHoverChange }) {
+export default function AccountCard({ account, isExpanded, onSelect, onEdit, onDelete }) {
   const { format } = useFormatCurrency()
   const skin       = getSkin(account.skinId)
   const showChip   = account.type === 'bank' || account.type === 'credit'
@@ -53,42 +50,27 @@ export default function AccountCard({ account, hovered, opened, dimmed, onSelect
     ? 'card-face__logo card-face__logo--dark'
     : 'card-face__logo'
 
-  // React-state driven transforms — keeps z-index clean with negative-margin stacking
-  const transform = opened  ? 'translateY(-44px) scale(1.025)'
-    : hovered ? 'translateY(-18px)'
-    : 'translateY(0)'
-  const zIndex  = opened ? 20 : hovered ? 10 : 1
-  const opacity = dimmed ? 0.65 : 1
-
   return (
     <div
-      className={`card-face${opened ? ' card-face--opened' : ''}`}
-      style={{
-        background: skin.colors.bg,
-        color:      skin.colors.text,
-        transform,
-        zIndex,
-        opacity,
-        transition: 'transform 0.28s cubic-bezier(0.34, 1.28, 0.64, 1), opacity 0.2s ease, box-shadow 0.2s ease',
-      }}
+      className={`card-face${isExpanded ? ' expanded' : ''}`}
+      style={{ background: skin.colors.bg, color: skin.colors.text }}
       data-skin={account.skinId}
       onClick={() => onSelect(account)}
-      onMouseEnter={() => onHoverChange(account.id)}
-      onMouseLeave={() => onHoverChange(null)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onSelect(account)}
-      aria-label={`${account.name} — ${format(account.balance ?? 0)}${opened ? ', opened — press again for transactions' : ''}`}
+      aria-label={`${account.name} — ${format(account.balance ?? 0)}`}
+      aria-expanded={isExpanded}
     >
       {/* Plastic sheen */}
       <div className="card-face__overlay" />
 
-      {/* Watermark — full-bleed faded logo behind all content */}
+      {/* Watermark */}
       {skin.logoUrl && (
         <img src={skin.logoUrl} alt="" className="card-face__watermark" aria-hidden="true" />
       )}
 
-      {/* ── Top: logo OR skin name (never both) ── */}
+      {/* ── Top: logo OR skin name ── */}
       <div className="card-face__top">
         <div className="card-face__logo-area">
           {skin.logoUrl ? (
@@ -106,13 +88,13 @@ export default function AccountCard({ account, hovered, opened, dimmed, onSelect
         </div>
       </div>
 
-      {/* ── Middle: chip + NFC for physical cards ── */}
+      {/* ── Middle: EMV chip + NFC ── */}
       <div className="card-face__middle">
         {showChip && <Chip />}
         {showChip && <Contactless />}
       </div>
 
-      {/* ── Bottom: cardholder name + masked number | balance ── */}
+      {/* ── Bottom: number | cardholder | type  /  balance ── */}
       <div className="card-face__bottom">
         <div className="card-face__bottom-left">
           <div className="card-face__number">
@@ -120,7 +102,6 @@ export default function AccountCard({ account, hovered, opened, dimmed, onSelect
               ? `•••• •••• •••• ${account.lastFour}`
               : `•••• •••• •••• ••••`}
           </div>
-          {/* account.name shown as the cardholder name on the card */}
           <div className="card-face__cardholder" style={{ color: skin.colors.text }}>
             {account.name}
           </div>
@@ -133,15 +114,31 @@ export default function AccountCard({ account, hovered, opened, dimmed, onSelect
         </div>
       </div>
 
-      {/* Tap-again hint */}
-      {opened && (
-        <div className="card-face__txn-hint">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2 6h8M6 2l4 4-4 4"/>
-          </svg>
-          Tap again for transactions
+      {/* ── Inline transactions panel — shown when expanded ── */}
+      <div className="card-transactions" onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+          <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', textShadow: 'none' }}>
+            Recent Transactions
+          </span>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button
+              style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '6px', padding: '4px 10px', color: '#fff', fontSize: '11px', cursor: 'pointer' }}
+              onClick={(e) => { e.stopPropagation(); onEdit(account) }}
+            >
+              Edit
+            </button>
+            <button
+              style={{ background: 'rgba(229,62,62,0.3)', border: 'none', borderRadius: '6px', padding: '4px 10px', color: '#fff', fontSize: '11px', cursor: 'pointer' }}
+              onClick={(e) => { e.stopPropagation(); onDelete(account.id) }}
+            >
+              Delete
+            </button>
+          </div>
         </div>
-      )}
+        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', textShadow: 'none' }}>
+          No recent transactions yet.
+        </p>
+      </div>
     </div>
   )
 }

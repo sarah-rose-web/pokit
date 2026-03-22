@@ -2,10 +2,9 @@ import { useEffect, useState }  from 'react'
 import { useAuthStore }          from '@/store/authStore'
 import { useAccountsStore }      from '@/store/accountsStore'
 import { useFormatCurrency }     from '@/hooks/useFormatCurrency'
-import BottomNav                 from '@/components/BottomNav'
-import AccountCard               from './AccountCard'
-import AccountModal              from './AccountModal'
-import AccountDetailDrawer       from './AccountDetailDrawer'
+import BottomNav    from '@/components/BottomNav'
+import AccountCard  from './AccountCard'
+import AccountModal from './AccountModal'
 import './accounts.css'
 
 const FILTERS = [
@@ -22,22 +21,20 @@ export default function AccountsPage() {
     useAccountsStore()
   const { format } = useFormatCurrency()
 
-  const [filterType,      setFilterType]      = useState('all')
-  const [viewMode,        setViewMode]        = useState('stack') // 'stack' | 'grid'
-  const [hoveredId,       setHoveredId]       = useState(null)   // card being hovered
-  const [openedId,        setOpenedId]        = useState(null)   // card opened (first click)
-  const [selectedAccount, setSelectedAccount] = useState(null)   // drawer open (second click)
-  const [modal,           setModal]           = useState(null)   // null | 'add' | account object
-  const [saving,          setSaving]          = useState(false)
-  const [confirmDelete,   setConfirmDelete]   = useState(null)   // account id
+  const [filterType,    setFilterType]    = useState('all')
+  const [viewMode,      setViewMode]      = useState('stack') // 'stack' | 'grid'
+  const [expandedId,    setExpandedId]    = useState(null)    // which card is expanded inline
+  const [modal,         setModal]         = useState(null)    // null | 'add' | account object
+  const [saving,        setSaving]        = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(null)    // account id
 
   useEffect(() => {
     if (user) subscribe(user.uid)
     return () => unsubscribe()
   }, [user])
 
-  // Clear opened card when filter or view changes
-  useEffect(() => { setOpenedId(null) }, [filterType, viewMode])
+  // Collapse any expanded card when filter or view changes
+  useEffect(() => { setExpandedId(null) }, [filterType, viewMode])
 
   // Net worth
   const assets = accounts
@@ -55,18 +52,9 @@ export default function AccountsPage() {
     ? accounts
     : accounts.filter((a) => a.type === filterType)
 
-  /**
-   * First click  → opens/highlights the card.
-   * Second click → opens the transactions drawer and clears opened state.
-   * @param {import('@/store/accountsStore').Account} account
-   */
-  function handleCardClick(account) {
-    if (openedId === account.id) {
-      setSelectedAccount(account)
-      setOpenedId(null)
-    } else {
-      setOpenedId(account.id)
-    }
+  /** Toggle inline expansion. Clicking the already-expanded card collapses it. */
+  function handleCardSelect(account) {
+    setExpandedId((prev) => prev === account.id ? null : account.id)
   }
 
   async function handleSave(data) {
@@ -92,8 +80,7 @@ export default function AccountsPage() {
 
   return (
     <>
-      {/* Clicking outside the wallet stack clears the opened card */}
-      <main className="room page-enter" onClick={() => setOpenedId(null)}>
+      <main className="room page-enter" onClick={() => setExpandedId(null)}>
         <h1 className="room__title">Bedroom</h1>
 
         {/* Net worth jewelry box */}
@@ -175,11 +162,10 @@ export default function AccountsPage() {
               <AccountCard
                 key={acc.id}
                 account={acc}
-                hovered={hoveredId === acc.id}
-                opened={openedId === acc.id}
-                dimmed={openedId !== null && openedId !== acc.id}
-                onSelect={handleCardClick}
-                onHoverChange={setHoveredId}
+                isExpanded={expandedId === acc.id}
+                onSelect={handleCardSelect}
+                onEdit={(a) => setModal(a)}
+                onDelete={(id) => setConfirmDelete(id)}
               />
             ))}
           </div>
@@ -192,16 +178,6 @@ export default function AccountsPage() {
       </main>
 
       <BottomNav />
-
-      {/* Detail drawer — opens when a card is tapped */}
-      {selectedAccount && (
-        <AccountDetailDrawer
-          account={selectedAccount}
-          onClose={() => setSelectedAccount(null)}
-          onEdit={(a) => { setSelectedAccount(null); setModal(a) }}
-          onDelete={(id) => { setSelectedAccount(null); setConfirmDelete(id) }}
-        />
-      )}
 
       {/* Add / Edit modal */}
       {modal !== null && (
