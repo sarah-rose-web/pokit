@@ -9,8 +9,9 @@
  * When it is missing or null, the card falls back to `colors.bg` (CSS color or gradient).
  *
  * TO ADD YOUR REAL CARD PHOTOS:
- *   1. Take a straight-on, well-lit photo of the physical card.
- *   2. Crop to exactly 880×560 px (the standard 1.586 card ratio, doubled for retina).
+ *   1. Take a straight-on, well-lit photo of the physical card (landscape orientation).
+ *   2. Crop to exactly 1000 × 630 px (landscape credit card ratio, ~1.586:1, doubled for retina).
+ *      Your photos are 1000 × 1568 px portrait — rotate/crop them to landscape before dropping in.
  *   3. Export as PNG and drop into /public/card-art/{id}.png  — e.g. bdo-gold.png
  *   4. The card will automatically switch to the photo the next time you reload.
  *
