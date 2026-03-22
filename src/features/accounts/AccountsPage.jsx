@@ -1,28 +1,39 @@
-import { useEffect, useState } from 'react'
-import { useAuthStore }     from '@/store/authStore'
-import { useAccountsStore } from '@/store/accountsStore'
-import { useFormatCurrency } from '@/hooks/useFormatCurrency'
-import BottomNav    from '@/components/BottomNav'
-import AccountCard  from './AccountCard'
-import AccountModal from './AccountModal'
+import { useEffect, useState }  from 'react'
+import { useAuthStore }          from '@/store/authStore'
+import { useAccountsStore }      from '@/store/accountsStore'
+import { useFormatCurrency }     from '@/hooks/useFormatCurrency'
+import BottomNav                 from '@/components/BottomNav'
+import AccountCard               from './AccountCard'
+import AccountModal              from './AccountModal'
+import AccountDetailDrawer       from './AccountDetailDrawer'
 import './accounts.css'
 
+const FILTERS = [
+  { id: 'all',     label: 'All' },
+  { id: 'bank',    label: 'Bank' },
+  { id: 'ewallet', label: 'E-Wallet' },
+  { id: 'credit',  label: 'Credit' },
+  { id: 'cash',    label: 'Cash' },
+]
+
 export default function AccountsPage() {
-  const user     = useAuthStore((s) => s.user)
+  const user = useAuthStore((s) => s.user)
   const { accounts, loading, subscribe, unsubscribe, addAccount, updateAccount, deleteAccount } =
     useAccountsStore()
   const { format } = useFormatCurrency()
 
-  const [modal,  setModal]  = useState(null)   // null | 'add' | Account object
-  const [saving, setSaving] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(null) // account id
+  const [filterType,     setFilterType]     = useState('all')
+  const [selectedAccount, setSelectedAccount] = useState(null)  // account object | null
+  const [modal,          setModal]          = useState(null)    // null | 'add' | account object
+  const [saving,         setSaving]         = useState(false)
+  const [confirmDelete,  setConfirmDelete]  = useState(null)    // account id
 
   useEffect(() => {
     if (user) subscribe(user.uid)
     return () => unsubscribe()
   }, [user])
 
-  // Net worth breakdown
+  // Net worth
   const assets = accounts
     .filter((a) => a.type !== 'credit')
     .reduce((sum, a) => sum + (a.balance ?? 0), 0)
@@ -32,6 +43,11 @@ export default function AccountsPage() {
     .reduce((sum, a) => sum + (a.balance ?? 0), 0)
 
   const netWorth = assets - creditDebt
+
+  // Filtered list
+  const visible = filterType === 'all'
+    ? accounts
+    : accounts.filter((a) => a.type === filterType)
 
   async function handleSave(data) {
     if (!user) return
@@ -69,40 +85,66 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        {/* Account cards */}
+        {/* Filter tabs */}
+        {accounts.length > 0 && (
+          <div className="accounts-filters">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                className={`filter-pill${filterType === f.id ? ' filter-pill--active' : ''}`}
+                onClick={() => setFilterType(f.id)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Wallet stack */}
         {loading ? (
           <div className="room__empty">Loading…</div>
-        ) : accounts.length === 0 ? (
+        ) : visible.length === 0 && accounts.length === 0 ? (
           <div className="room__empty">
             <p>No accounts yet.</p>
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
               Add where your money lives.
             </p>
           </div>
+        ) : visible.length === 0 ? (
+          <div className="room__empty" style={{ paddingTop: 'var(--space-6)' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)' }}>
+              No {filterType} accounts.
+            </p>
+          </div>
         ) : (
           <div className="accounts-stack">
-            {accounts.map((acc) => (
+            {visible.map((acc) => (
               <AccountCard
                 key={acc.id}
                 account={acc}
-                onEdit={(a) => setModal(a)}
-                onDelete={(id) => setConfirmDelete(id)}
+                onSelect={setSelectedAccount}
               />
             ))}
           </div>
         )}
 
-        {/* Add button */}
-        <button
-          className="fab"
-          onClick={() => setModal('add')}
-          aria-label="Add account"
-        >
+        {/* FAB */}
+        <button className="fab" onClick={() => setModal('add')} aria-label="Add account">
           +
         </button>
       </main>
 
       <BottomNav />
+
+      {/* Detail drawer — opens when a card is tapped */}
+      {selectedAccount && (
+        <AccountDetailDrawer
+          account={selectedAccount}
+          onClose={() => setSelectedAccount(null)}
+          onEdit={(a) => { setSelectedAccount(null); setModal(a) }}
+          onDelete={(id) => { setSelectedAccount(null); setConfirmDelete(id) }}
+        />
+      )}
 
       {/* Add / Edit modal */}
       {modal !== null && (

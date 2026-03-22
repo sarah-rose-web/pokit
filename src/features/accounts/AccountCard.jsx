@@ -1,4 +1,4 @@
-import { getSkin } from '@/config/cardSkins'
+import { getSkin }          from '@/config/cardSkins'
 import { useFormatCurrency } from '@/hooks/useFormatCurrency'
 
 function Chip() {
@@ -26,23 +26,22 @@ function Contactless() {
   )
 }
 
+/** Light-background skins need a dark logo instead of the default white filter */
+const LIGHT_BG_SKINS = new Set(['generic-light', 'generic-gold'])
+
 /**
+ * Tappable card in the wallet stack. Click anywhere to open the detail drawer.
+ *
  * @param {{
  *   account:  import('@/store/accountsStore').Account,
- *   onEdit:   (account: import('@/store/accountsStore').Account) => void,
- *   onDelete: (id: string) => void,
+ *   onSelect: (account: import('@/store/accountsStore').Account) => void,
  * }} props
  */
-/** Light-background skins need a dark logo instead of the default white filter */
-const LIGHT_BG_SKINS = new Set([
-  'generic-light', 'generic-gold',
-])
-
-export default function AccountCard({ account, onEdit, onDelete }) {
-  const { format } = useFormatCurrency()
-  const skin = getSkin(account.skinId)
-  const showChip = account.type === 'bank' || account.type === 'credit'
-  const logoClass = LIGHT_BG_SKINS.has(account.skinId)
+export default function AccountCard({ account, onSelect }) {
+  const { format }   = useFormatCurrency()
+  const skin         = getSkin(account.skinId)
+  const showChip     = account.type === 'bank' || account.type === 'credit'
+  const logoClass    = LIGHT_BG_SKINS.has(account.skinId)
     ? 'card-face__logo card-face__logo--dark'
     : 'card-face__logo'
 
@@ -51,11 +50,16 @@ export default function AccountCard({ account, onEdit, onDelete }) {
       className="card-face"
       style={{ background: skin.colors.bg, color: skin.colors.text }}
       data-skin={account.skinId}
+      onClick={() => onSelect(account)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onSelect(account)}
+      aria-label={`${account.name} — ${format(account.balance ?? 0)}`}
     >
-      {/* Gloss overlay for depth */}
+      {/* Gloss overlay */}
       <div className="card-face__overlay" />
 
-      {/* Massive faded watermark — the big logo behind the card content */}
+      {/* Watermark — big faded logo behind the content */}
       {skin.logoUrl && (
         <img
           src={skin.logoUrl}
@@ -67,38 +71,17 @@ export default function AccountCard({ account, onEdit, onDelete }) {
 
       <div className="card-face__top">
         <div className="card-face__logo-area">
-          {skin.logoUrl
-            ? <img
-                src={skin.logoUrl}
-                alt={skin.name}
-                className={logoClass}
-                onError={(e) => { e.currentTarget.style.display = 'none' }}
-              />
-            : null
-          }
+          {skin.logoUrl && (
+            <img
+              src={skin.logoUrl}
+              alt={skin.name}
+              className={logoClass}
+              onError={(e) => { e.currentTarget.style.display = 'none' }}
+            />
+          )}
           <span className="card-face__bank-name" style={{ color: skin.colors.text }}>
             {account.name}
           </span>
-        </div>
-        <div className="card-face__menu">
-          <button
-            className="card-face__menu-btn"
-            onClick={() => onEdit(account)}
-            aria-label={`Edit ${account.name}`}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9.5 2.5l2 2L4 12H2v-2L9.5 2.5Z"/>
-            </svg>
-          </button>
-          <button
-            className="card-face__menu-btn card-face__menu-btn--danger"
-            onClick={() => onDelete(account.id)}
-            aria-label={`Delete ${account.name}`}
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 3.5h10M5 3.5V2.5h4v1M5.5 6v4M8.5 6v4M3 3.5l.7 7.2a1 1 0 0 0 1 .8h4.6a1 1 0 0 0 1-.8L11 3.5"/>
-            </svg>
-          </button>
         </div>
       </div>
 
