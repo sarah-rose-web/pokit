@@ -3,7 +3,14 @@
  * Real card variants for PH banks, e-wallets, and international platforms.
  * Logos are local SVGs in /public/bank-logos/
  *
- * @typedef {{ id: string, name: string, type: string, colors: { bg: string, text: string }, logoUrl: string | null }} CardSkin
+ * @typedef {{
+ *   id:       string,
+ *   name:     string,
+ *   type:     string,
+ *   baseType: 'cash' | 'bank' | 'ewallet' | 'credit',
+ *   colors:   { bg: string, text: string },
+ *   logoUrl:  string | null,
+ * }} CardSkin
  */
 
 const L = (file) => `/bank-logos/${file}.svg`
@@ -11,68 +18,68 @@ const L = (file) => `/bank-logos/${file}.svg`
 /** @type {CardSkin[]} */
 export const CARD_SKINS = [
   // ── E-wallets & Digital Banks ──────────────────────────
-  { id: 'gcash',         name: 'GCash Mastercard',       type: 'ewallet',       colors: { bg: '#007DFE',                                                           text: '#FFFFFF' }, logoUrl: L('gcash') },
-  { id: 'maya-dark',     name: 'Maya Card (Black)',       type: 'ewallet',       colors: { bg: '#111111',                                                           text: '#00E570' }, logoUrl: L('maya') },
-  { id: 'maya-green',    name: 'Maya Card (Green)',       type: 'ewallet',       colors: { bg: '#00E570',                                                           text: '#111111' }, logoUrl: L('maya') },
-  { id: 'gotyme',        name: 'GoTyme Visa',             type: 'ewallet',       colors: { bg: 'linear-gradient(135deg, #00D1FF 0%, #0047FF 100%)',                  text: '#FFFFFF' }, logoUrl: L('gotyme') },
-  { id: 'seabank',       name: 'SeaBank Debit',           type: 'ewallet',       colors: { bg: '#FF6B00',                                                           text: '#FFFFFF' }, logoUrl: L('seabank') },
-  { id: 'tonik',         name: 'Tonik Stash',             type: 'ewallet',       colors: { bg: '#5A2E8A',                                                           text: '#FFCC00' }, logoUrl: L('tonik') },
+  { id: 'gcash',         name: 'GCash Mastercard',       type: 'ewallet',       baseType: 'ewallet',  colors: { bg: '#007DFE',                                                           text: '#FFFFFF' }, logoUrl: L('gcash') },
+  { id: 'maya-dark',     name: 'Maya Card (Black)',       type: 'ewallet',       baseType: 'ewallet',  colors: { bg: '#111111',                                                           text: '#00E570' }, logoUrl: L('maya') },
+  { id: 'maya-green',    name: 'Maya Card (Green)',       type: 'ewallet',       baseType: 'ewallet',  colors: { bg: '#00E570',                                                           text: '#111111' }, logoUrl: L('maya') },
+  { id: 'gotyme',        name: 'GoTyme Visa',             type: 'ewallet',       baseType: 'ewallet',  colors: { bg: 'linear-gradient(135deg, #00D1FF 0%, #0047FF 100%)',                  text: '#FFFFFF' }, logoUrl: L('gotyme') },
+  { id: 'seabank',       name: 'SeaBank Debit',           type: 'ewallet',       baseType: 'ewallet',  colors: { bg: '#FF6B00',                                                           text: '#FFFFFF' }, logoUrl: L('seabank') },
+  { id: 'tonik',         name: 'Tonik Stash',             type: 'ewallet',       baseType: 'ewallet',  colors: { bg: '#5A2E8A',                                                           text: '#FFCC00' }, logoUrl: L('tonik') },
 
   // ── BPI ────────────────────────────────────────────────
-  { id: 'bpi-debit',     name: 'BPI Debit Classic',      type: 'local_bank',    colors: { bg: '#B22222',                                                           text: '#FFFFFF' }, logoUrl: L('bpi') },
-  { id: 'bpi-blue',      name: 'BPI Blue Credit',        type: 'local_bank',    colors: { bg: '#003087',                                                           text: '#FFFFFF' }, logoUrl: L('bpi') },
-  { id: 'bpi-gold',      name: 'BPI Gold Credit',        type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',                  text: '#111111' }, logoUrl: L('bpi') },
-  { id: 'bpi-signature', name: 'BPI Visa Signature',     type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #1C1C1C 0%, #000000 100%)',                  text: '#FFFFFF' }, logoUrl: L('bpi') },
+  { id: 'bpi-debit',     name: 'BPI Debit Classic',      type: 'local_bank',    baseType: 'bank',     colors: { bg: '#B22222',                                                           text: '#FFFFFF' }, logoUrl: L('bpi') },
+  { id: 'bpi-blue',      name: 'BPI Blue Credit',        type: 'local_bank',    baseType: 'credit',   colors: { bg: '#003087',                                                           text: '#FFFFFF' }, logoUrl: L('bpi') },
+  { id: 'bpi-gold',      name: 'BPI Gold Credit',        type: 'local_bank',    baseType: 'credit',   colors: { bg: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',                  text: '#111111' }, logoUrl: L('bpi') },
+  { id: 'bpi-signature', name: 'BPI Visa Signature',     type: 'local_bank',    baseType: 'credit',   colors: { bg: 'linear-gradient(135deg, #1C1C1C 0%, #000000 100%)',                  text: '#FFFFFF' }, logoUrl: L('bpi') },
 
   // ── BDO ────────────────────────────────────────────────
-  { id: 'bdo-debit',     name: 'BDO Debit Classic',      type: 'local_bank',    colors: { bg: '#002A54',                                                           text: '#FFFFFF' }, logoUrl: L('bdo') },
-  { id: 'bdo-emerald',   name: 'BDO Emerald Rewards',    type: 'local_bank',    colors: { bg: '#006B3F',                                                           text: '#FFFFFF' }, logoUrl: L('bdo') },
-  { id: 'bdo-gold',      name: 'BDO Gold Credit',        type: 'local_bank',    colors: { bg: '#C5A059',                                                           text: '#111111' }, logoUrl: L('bdo') },
-  { id: 'bdo-platinum',  name: 'BDO Platinum',           type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #7D7D7D 0%, #363636 100%)',                  text: '#FFFFFF' }, logoUrl: L('bdo') },
+  { id: 'bdo-debit',     name: 'BDO Debit Classic',      type: 'local_bank',    baseType: 'bank',     colors: { bg: '#002A54',                                                           text: '#FFFFFF' }, logoUrl: L('bdo') },
+  { id: 'bdo-emerald',   name: 'BDO Emerald Rewards',    type: 'local_bank',    baseType: 'credit',   colors: { bg: '#006B3F',                                                           text: '#FFFFFF' }, logoUrl: L('bdo') },
+  { id: 'bdo-gold',      name: 'BDO Gold Credit',        type: 'local_bank',    baseType: 'credit',   colors: { bg: '#C5A059',                                                           text: '#111111' }, logoUrl: L('bdo') },
+  { id: 'bdo-platinum',  name: 'BDO Platinum',           type: 'local_bank',    baseType: 'credit',   colors: { bg: 'linear-gradient(135deg, #7D7D7D 0%, #363636 100%)',                  text: '#FFFFFF' }, logoUrl: L('bdo') },
 
   // ── UnionBank ──────────────────────────────────────────
-  { id: 'ub-debit',      name: 'UnionBank Debit',        type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #FF6600 0%, #FF6600 48%, #00205B 52%, #00205B 100%)', text: '#FFFFFF' }, logoUrl: L('unionbank') },
-  { id: 'ub-rewards',    name: 'UB Rewards Credit',      type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)',                  text: '#FFFFFF' }, logoUrl: L('unionbank') },
-  { id: 'ub-miles',      name: 'UB Miles+ Credit',       type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #004D40 0%, #000000 100%)',                  text: '#FFFFFF' }, logoUrl: L('unionbank') },
+  { id: 'ub-debit',      name: 'UnionBank Debit',        type: 'local_bank',    baseType: 'bank',     colors: { bg: 'linear-gradient(135deg, #FF6600 0%, #FF6600 48%, #00205B 52%, #00205B 100%)', text: '#FFFFFF' }, logoUrl: L('unionbank') },
+  { id: 'ub-rewards',    name: 'UB Rewards Credit',      type: 'local_bank',    baseType: 'credit',   colors: { bg: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)',                  text: '#FFFFFF' }, logoUrl: L('unionbank') },
+  { id: 'ub-miles',      name: 'UB Miles+ Credit',       type: 'local_bank',    baseType: 'credit',   colors: { bg: 'linear-gradient(135deg, #004D40 0%, #000000 100%)',                  text: '#FFFFFF' }, logoUrl: L('unionbank') },
 
   // ── Metrobank ──────────────────────────────────────────
-  { id: 'metro-debit',   name: 'Metrobank Debit',        type: 'local_bank',    colors: { bg: '#0033A0',                                                           text: '#FFFFFF' }, logoUrl: L('metrobank') },
-  { id: 'metro-titan',   name: 'Metrobank Titanium',     type: 'local_bank',    colors: { bg: '#8C92AC',                                                           text: '#111111' }, logoUrl: L('metrobank') },
-  { id: 'metro-world',   name: 'Metrobank World',        type: 'local_bank',    colors: { bg: '#0A1128',                                                           text: '#D4AF37' }, logoUrl: L('metrobank') },
+  { id: 'metro-debit',   name: 'Metrobank Debit',        type: 'local_bank',    baseType: 'bank',     colors: { bg: '#0033A0',                                                           text: '#FFFFFF' }, logoUrl: L('metrobank') },
+  { id: 'metro-titan',   name: 'Metrobank Titanium',     type: 'local_bank',    baseType: 'credit',   colors: { bg: '#8C92AC',                                                           text: '#111111' }, logoUrl: L('metrobank') },
+  { id: 'metro-world',   name: 'Metrobank World',        type: 'local_bank',    baseType: 'credit',   colors: { bg: '#0A1128',                                                           text: '#D4AF37' }, logoUrl: L('metrobank') },
 
   // ── RCBC ───────────────────────────────────────────────
-  { id: 'rcbc-debit',    name: 'RCBC MyDebit',           type: 'local_bank',    colors: { bg: '#00205B',                                                           text: '#FFFFFF' }, logoUrl: L('rcbc') },
-  { id: 'rcbc-hexagon',  name: 'RCBC Hexagon Club',      type: 'local_bank',    colors: { bg: '#001A11',                                                           text: '#D4AF37' }, logoUrl: L('rcbc') },
-  { id: 'rcbc-flex',     name: 'RCBC Flex Visa',         type: 'local_bank',    colors: { bg: '#008C99',                                                           text: '#FFFFFF' }, logoUrl: L('rcbc') },
+  { id: 'rcbc-debit',    name: 'RCBC MyDebit',           type: 'local_bank',    baseType: 'bank',     colors: { bg: '#00205B',                                                           text: '#FFFFFF' }, logoUrl: L('rcbc') },
+  { id: 'rcbc-hexagon',  name: 'RCBC Hexagon Club',      type: 'local_bank',    baseType: 'credit',   colors: { bg: '#001A11',                                                           text: '#D4AF37' }, logoUrl: L('rcbc') },
+  { id: 'rcbc-flex',     name: 'RCBC Flex Visa',         type: 'local_bank',    baseType: 'credit',   colors: { bg: '#008C99',                                                           text: '#FFFFFF' }, logoUrl: L('rcbc') },
 
   // ── Security Bank ──────────────────────────────────────
-  { id: 'secb-debit',    name: 'Security Bank Debit',    type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #007A33 0%, #004D20 100%)',                  text: '#FFFFFF' }, logoUrl: L('securitybank') },
-  { id: 'secb-wave',     name: 'Security Bank Wave',     type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)',                  text: '#FFFFFF' }, logoUrl: L('securitybank') },
-  { id: 'secb-platinum', name: 'Security Bank Platinum', type: 'local_bank',    colors: { bg: '#A8A9AD',                                                           text: '#111111' }, logoUrl: L('securitybank') },
+  { id: 'secb-debit',    name: 'Security Bank Debit',    type: 'local_bank',    baseType: 'bank',     colors: { bg: 'linear-gradient(135deg, #007A33 0%, #004D20 100%)',                  text: '#FFFFFF' }, logoUrl: L('securitybank') },
+  { id: 'secb-wave',     name: 'Security Bank Wave',     type: 'local_bank',    baseType: 'credit',   colors: { bg: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)',                  text: '#FFFFFF' }, logoUrl: L('securitybank') },
+  { id: 'secb-platinum', name: 'Security Bank Platinum', type: 'local_bank',    baseType: 'credit',   colors: { bg: '#A8A9AD',                                                           text: '#111111' }, logoUrl: L('securitybank') },
 
   // ── EastWest ───────────────────────────────────────────
-  { id: 'ew-debit',      name: 'EastWest Debit',         type: 'local_bank',    colors: { bg: '#6A1B9A',                                                           text: '#FFFFFF' }, logoUrl: L('eastwest') },
-  { id: 'ew-platinum',   name: 'EastWest Platinum',      type: 'local_bank',    colors: { bg: '#1C1C1C',                                                           text: '#FFFFFF' }, logoUrl: L('eastwest') },
+  { id: 'ew-debit',      name: 'EastWest Debit',         type: 'local_bank',    baseType: 'bank',     colors: { bg: '#6A1B9A',                                                           text: '#FFFFFF' }, logoUrl: L('eastwest') },
+  { id: 'ew-platinum',   name: 'EastWest Platinum',      type: 'local_bank',    baseType: 'credit',   colors: { bg: '#1C1C1C',                                                           text: '#FFFFFF' }, logoUrl: L('eastwest') },
 
   // ── Landbank ───────────────────────────────────────────
-  { id: 'landbank',      name: 'Landbank Visa',          type: 'local_bank',    colors: { bg: '#006400',                                                           text: '#FFFFFF' }, logoUrl: L('landbank') },
+  { id: 'landbank',      name: 'Landbank Visa',          type: 'local_bank',    baseType: 'bank',     colors: { bg: '#006400',                                                           text: '#FFFFFF' }, logoUrl: L('landbank') },
 
   // ── International & Freelance ──────────────────────────
-  { id: 'wise',          name: 'Wise',                   type: 'international', colors: { bg: '#9FE870',                                                           text: '#163300' }, logoUrl: L('wise') },
-  { id: 'paypal',        name: 'PayPal',                 type: 'international', colors: { bg: 'linear-gradient(135deg, #003087 0%, #0079C1 100%)',                  text: '#FFFFFF' }, logoUrl: L('paypal') },
-  { id: 'payoneer',      name: 'Payoneer',               type: 'international', colors: { bg: '#FF5D00',                                                           text: '#FFFFFF' }, logoUrl: L('payoneer') },
-  { id: 'deel',          name: 'Deel',                   type: 'international', colors: { bg: '#15357A',                                                           text: '#FFFFFF' }, logoUrl: L('deel') },
-  { id: 'shoppepay',     name: 'ShopeePay',              type: 'ewallet',       colors: { bg: 'linear-gradient(135deg, #EE4D2D 0%, #CC3010 100%)',                  text: '#FFFFFF' }, logoUrl: L('shoppepay') },
-  { id: 'grabpay',       name: 'GrabPay',                type: 'ewallet',       colors: { bg: 'linear-gradient(135deg, #00B14F 0%, #007A36 100%)',                  text: '#FFFFFF' }, logoUrl: L('grabpay') },
-  { id: 'coins',         name: 'Coins.ph',               type: 'ewallet',       colors: { bg: 'linear-gradient(135deg, #6B21A8 0%, #4C1778 100%)',                  text: '#FFFFFF' }, logoUrl: L('coins') },
+  { id: 'wise',          name: 'Wise',                   type: 'international', baseType: 'ewallet',  colors: { bg: '#9FE870',                                                           text: '#163300' }, logoUrl: L('wise') },
+  { id: 'paypal',        name: 'PayPal',                 type: 'international', baseType: 'ewallet',  colors: { bg: 'linear-gradient(135deg, #003087 0%, #0079C1 100%)',                  text: '#FFFFFF' }, logoUrl: L('paypal') },
+  { id: 'payoneer',      name: 'Payoneer',               type: 'international', baseType: 'ewallet',  colors: { bg: '#FF5D00',                                                           text: '#FFFFFF' }, logoUrl: L('payoneer') },
+  { id: 'deel',          name: 'Deel',                   type: 'international', baseType: 'ewallet',  colors: { bg: '#15357A',                                                           text: '#FFFFFF' }, logoUrl: L('deel') },
+  { id: 'shoppepay',     name: 'ShopeePay',              type: 'ewallet',       baseType: 'ewallet',  colors: { bg: 'linear-gradient(135deg, #EE4D2D 0%, #CC3010 100%)',                  text: '#FFFFFF' }, logoUrl: L('shoppepay') },
+  { id: 'grabpay',       name: 'GrabPay',                type: 'ewallet',       baseType: 'ewallet',  colors: { bg: 'linear-gradient(135deg, #00B14F 0%, #007A36 100%)',                  text: '#FFFFFF' }, logoUrl: L('grabpay') },
+  { id: 'coins',         name: 'Coins.ph',               type: 'ewallet',       baseType: 'ewallet',  colors: { bg: 'linear-gradient(135deg, #6B21A8 0%, #4C1778 100%)',                  text: '#FFFFFF' }, logoUrl: L('coins') },
 
   // ── Generic ────────────────────────────────────────────
-  { id: 'generic-cash',  name: 'Cash',                   type: 'generic',       colors: { bg: 'linear-gradient(135deg, #5C7A4E 0%, #3D5235 100%)',                  text: '#FFFFFF' }, logoUrl: null },
-  { id: 'generic-dark',  name: 'Dark Card',              type: 'generic',       colors: { bg: '#2D3748',                                                           text: '#FFFFFF' }, logoUrl: null },
-  { id: 'generic-rose',  name: 'Rose',                   type: 'generic',       colors: { bg: 'linear-gradient(135deg, #D4788E 0%, #A84E64 100%)',                  text: '#FFFFFF' }, logoUrl: null },
-  { id: 'generic-gold',  name: 'Gold',                   type: 'generic',       colors: { bg: 'linear-gradient(135deg, #D4A84B 0%, #A07820 100%)',                  text: '#FFFFFF' }, logoUrl: null },
-  { id: 'generic-navy',  name: 'Navy',                   type: 'generic',       colors: { bg: 'linear-gradient(135deg, #2D3561 0%, #1A2040 100%)',                  text: '#FFFFFF' }, logoUrl: null },
-  { id: 'generic-light', name: 'Light Card',             type: 'generic',       colors: { bg: '#EDF2F7',                                                           text: '#1A202C' }, logoUrl: null },
+  { id: 'generic-cash',  name: 'Cash',                   type: 'generic',       baseType: 'cash',     colors: { bg: 'linear-gradient(135deg, #5C7A4E 0%, #3D5235 100%)',                  text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-dark',  name: 'Dark Card',              type: 'generic',       baseType: 'bank',     colors: { bg: '#2D3748',                                                           text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-rose',  name: 'Rose',                   type: 'generic',       baseType: 'bank',     colors: { bg: 'linear-gradient(135deg, #D4788E 0%, #A84E64 100%)',                  text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-gold',  name: 'Gold',                   type: 'generic',       baseType: 'bank',     colors: { bg: 'linear-gradient(135deg, #D4A84B 0%, #A07820 100%)',                  text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-navy',  name: 'Navy',                   type: 'generic',       baseType: 'bank',     colors: { bg: 'linear-gradient(135deg, #2D3561 0%, #1A2040 100%)',                  text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-light', name: 'Light Card',             type: 'generic',       baseType: 'bank',     colors: { bg: '#EDF2F7',                                                           text: '#1A202C' }, logoUrl: null },
 ]
 
 export const SKIN_CATEGORIES = [

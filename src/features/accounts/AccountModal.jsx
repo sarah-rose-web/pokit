@@ -35,10 +35,11 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
     }
   }, [account])
 
-  /** Called when user picks a bank — sets skin AND auto-fills name */
-  function handleBankSelect(id, bankName) {
+  /** Called when user picks a bank — sets skin, auto-fills name, and snaps the type */
+  function handleBankSelect(id, bankName, baseType) {
     setSkinId(id)
     setName(bankName)
+    if (baseType) setType(baseType)
   }
 
   function handleSubmit(e) {

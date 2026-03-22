@@ -8,7 +8,7 @@ import './BankSelectorDropdown.css'
  *
  * @param {{
  *   skinId:   string | null,
- *   onSelect: (skinId: string, name: string) => void,
+ *   onSelect: (skinId: string, name: string, baseType: 'cash'|'bank'|'ewallet'|'credit') => void,
  * }} props
  */
 export default function BankSelectorDropdown({ skinId, onSelect }) {
@@ -22,7 +22,7 @@ export default function BankSelectorDropdown({ skinId, onSelect }) {
     : null
 
   function handleSelect(skin) {
-    onSelect(skin.id, skin.name)
+    onSelect(skin.id, skin.name, skin.baseType)
     setOpen(false)
     setQuery('')
   }

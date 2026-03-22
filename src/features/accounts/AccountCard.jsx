@@ -33,10 +33,18 @@ function Contactless() {
  *   onDelete: (id: string) => void,
  * }} props
  */
+/** Light-background skins need a dark logo instead of the default white filter */
+const LIGHT_BG_SKINS = new Set([
+  'generic-light', 'generic-gold',
+])
+
 export default function AccountCard({ account, onEdit, onDelete }) {
   const { format } = useFormatCurrency()
   const skin = getSkin(account.skinId)
   const showChip = account.type === 'bank' || account.type === 'credit'
+  const logoClass = LIGHT_BG_SKINS.has(account.skinId)
+    ? 'card-face__logo card-face__logo--dark'
+    : 'card-face__logo'
 
   return (
     <div
@@ -44,13 +52,26 @@ export default function AccountCard({ account, onEdit, onDelete }) {
       style={{ background: skin.colors.bg, color: skin.colors.text }}
       data-skin={account.skinId}
     >
+      {/* Gloss overlay for depth */}
+      <div className="card-face__overlay" />
+
+      {/* Massive faded watermark — the big logo behind the card content */}
+      {skin.logoUrl && (
+        <img
+          src={skin.logoUrl}
+          alt=""
+          className="card-face__watermark"
+          aria-hidden="true"
+        />
+      )}
+
       <div className="card-face__top">
         <div className="card-face__logo-area">
           {skin.logoUrl
             ? <img
                 src={skin.logoUrl}
                 alt={skin.name}
-                className="card-face__logo"
+                className={logoClass}
                 onError={(e) => { e.currentTarget.style.display = 'none' }}
               />
             : null
