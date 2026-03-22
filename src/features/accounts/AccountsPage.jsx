@@ -22,16 +22,22 @@ export default function AccountsPage() {
     useAccountsStore()
   const { format } = useFormatCurrency()
 
-  const [filterType,     setFilterType]     = useState('all')
-  const [selectedAccount, setSelectedAccount] = useState(null)  // account object | null
-  const [modal,          setModal]          = useState(null)    // null | 'add' | account object
-  const [saving,         setSaving]         = useState(false)
-  const [confirmDelete,  setConfirmDelete]  = useState(null)    // account id
+  const [filterType,      setFilterType]      = useState('all')
+  const [viewMode,        setViewMode]        = useState('stack') // 'stack' | 'grid'
+  const [hoveredId,       setHoveredId]       = useState(null)   // card being hovered
+  const [openedId,        setOpenedId]        = useState(null)   // card opened (first click)
+  const [selectedAccount, setSelectedAccount] = useState(null)   // drawer open (second click)
+  const [modal,           setModal]           = useState(null)   // null | 'add' | account object
+  const [saving,          setSaving]          = useState(false)
+  const [confirmDelete,   setConfirmDelete]   = useState(null)   // account id
 
   useEffect(() => {
     if (user) subscribe(user.uid)
     return () => unsubscribe()
   }, [user])
+
+  // Clear opened card when filter or view changes
+  useEffect(() => { setOpenedId(null) }, [filterType, viewMode])
 
   // Net worth
   const assets = accounts
@@ -48,6 +54,20 @@ export default function AccountsPage() {
   const visible = filterType === 'all'
     ? accounts
     : accounts.filter((a) => a.type === filterType)
+
+  /**
+   * First click  → opens/highlights the card.
+   * Second click → opens the transactions drawer and clears opened state.
+   * @param {import('@/store/accountsStore').Account} account
+   */
+  function handleCardClick(account) {
+    if (openedId === account.id) {
+      setSelectedAccount(account)
+      setOpenedId(null)
+    } else {
+      setOpenedId(account.id)
+    }
+  }
 
   async function handleSave(data) {
     if (!user) return
@@ -72,7 +92,8 @@ export default function AccountsPage() {
 
   return (
     <>
-      <main className="room page-enter">
+      {/* Clicking outside the wallet stack clears the opened card */}
+      <main className="room page-enter" onClick={() => setOpenedId(null)}>
         <h1 className="room__title">Bedroom</h1>
 
         {/* Net worth jewelry box */}
@@ -85,19 +106,48 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        {/* Filter tabs */}
+        {/* Filter tabs + view toggle */}
         {accounts.length > 0 && (
-          <div className="accounts-filters">
-            {FILTERS.map((f) => (
+          <>
+            <div className="accounts-filters">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  className={`filter-pill${filterType === f.id ? ' filter-pill--active' : ''}`}
+                  onClick={() => setFilterType(f.id)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="view-toggle">
               <button
-                key={f.id}
-                className={`filter-pill${filterType === f.id ? ' filter-pill--active' : ''}`}
-                onClick={() => setFilterType(f.id)}
+                className={`view-btn${viewMode === 'stack' ? ' view-btn--active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setViewMode('stack') }}
+                title="Wallet stack"
               >
-                {f.label}
+                {/* stacked lines icon */}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <rect x="1" y="1" width="12" height="3.5" rx="1"/>
+                  <rect x="1" y="5.5" width="12" height="3.5" rx="1" opacity="0.6"/>
+                  <rect x="1" y="10" width="12" height="3" rx="1" opacity="0.35"/>
+                </svg>
               </button>
-            ))}
-          </div>
+              <button
+                className={`view-btn${viewMode === 'grid' ? ' view-btn--active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setViewMode('grid') }}
+                title="List view"
+              >
+                {/* list icon */}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <rect x="1" y="1"   width="12" height="3.5" rx="1"/>
+                  <rect x="1" y="5.5" width="12" height="3.5" rx="1"/>
+                  <rect x="1" y="10"  width="12" height="3"   rx="1"/>
+                </svg>
+              </button>
+            </div>
+          </>
         )}
 
         {/* Wallet stack */}
@@ -117,12 +167,19 @@ export default function AccountsPage() {
             </p>
           </div>
         ) : (
-          <div className="accounts-stack">
+          <div
+            className={viewMode === 'stack' ? 'accounts-stack' : 'accounts-grid'}
+            onClick={(e) => e.stopPropagation()}
+          >
             {visible.map((acc) => (
               <AccountCard
                 key={acc.id}
                 account={acc}
-                onSelect={setSelectedAccount}
+                hovered={hoveredId === acc.id}
+                opened={openedId === acc.id}
+                dimmed={openedId !== null && openedId !== acc.id}
+                onSelect={handleCardClick}
+                onHoverChange={setHoveredId}
               />
             ))}
           </div>

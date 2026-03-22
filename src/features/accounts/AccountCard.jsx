@@ -26,70 +26,93 @@ function Contactless() {
   )
 }
 
-/** Light-background skins need a dark logo instead of the default white filter */
+/** Light-background skins don't invert their logo */
 const LIGHT_BG_SKINS = new Set(['generic-light', 'generic-gold'])
 
 /**
- * Tappable card in the wallet stack. Click anywhere to open the detail drawer.
+ * Card in the wallet stack or grid.
+ *
+ * Hover  → lifts (React-state, NOT CSS :hover — avoids z-index wars)
+ * Click  → "opens" card (bigger lift + ring + hint)
+ * Click again while opened → parent fires drawer
  *
  * @param {{
- *   account:  import('@/store/accountsStore').Account,
- *   onSelect: (account: import('@/store/accountsStore').Account) => void,
+ *   account:       import('@/store/accountsStore').Account,
+ *   hovered:       boolean,
+ *   opened:        boolean,
+ *   dimmed:        boolean,
+ *   onSelect:      (account: import('@/store/accountsStore').Account) => void,
+ *   onHoverChange: (id: string | null) => void,
  * }} props
  */
-export default function AccountCard({ account, onSelect }) {
-  const { format }   = useFormatCurrency()
-  const skin         = getSkin(account.skinId)
-  const showChip     = account.type === 'bank' || account.type === 'credit'
-  const logoClass    = LIGHT_BG_SKINS.has(account.skinId)
+export default function AccountCard({ account, hovered, opened, dimmed, onSelect, onHoverChange }) {
+  const { format } = useFormatCurrency()
+  const skin       = getSkin(account.skinId)
+  const showChip   = account.type === 'bank' || account.type === 'credit'
+  const logoClass  = LIGHT_BG_SKINS.has(account.skinId)
     ? 'card-face__logo card-face__logo--dark'
     : 'card-face__logo'
 
+  // React-state driven transforms — keeps z-index clean with negative-margin stacking
+  const transform = opened  ? 'translateY(-44px) scale(1.025)'
+    : hovered ? 'translateY(-18px)'
+    : 'translateY(0)'
+  const zIndex  = opened ? 20 : hovered ? 10 : 1
+  const opacity = dimmed ? 0.65 : 1
+
   return (
     <div
-      className="card-face"
-      style={{ background: skin.colors.bg, color: skin.colors.text }}
+      className={`card-face${opened ? ' card-face--opened' : ''}`}
+      style={{
+        background: skin.colors.bg,
+        color:      skin.colors.text,
+        transform,
+        zIndex,
+        opacity,
+        transition: 'transform 0.28s cubic-bezier(0.34, 1.28, 0.64, 1), opacity 0.2s ease, box-shadow 0.2s ease',
+      }}
       data-skin={account.skinId}
       onClick={() => onSelect(account)}
+      onMouseEnter={() => onHoverChange(account.id)}
+      onMouseLeave={() => onHoverChange(null)}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onSelect(account)}
-      aria-label={`${account.name} — ${format(account.balance ?? 0)}`}
+      aria-label={`${account.name} — ${format(account.balance ?? 0)}${opened ? ', opened — press again for transactions' : ''}`}
     >
-      {/* Gloss overlay */}
+      {/* Plastic sheen */}
       <div className="card-face__overlay" />
 
-      {/* Watermark — big faded logo behind the content */}
+      {/* Watermark — full-bleed faded logo behind all content */}
       {skin.logoUrl && (
-        <img
-          src={skin.logoUrl}
-          alt=""
-          className="card-face__watermark"
-          aria-hidden="true"
-        />
+        <img src={skin.logoUrl} alt="" className="card-face__watermark" aria-hidden="true" />
       )}
 
+      {/* ── Top: logo OR skin name (never both) ── */}
       <div className="card-face__top">
         <div className="card-face__logo-area">
-          {skin.logoUrl && (
+          {skin.logoUrl ? (
             <img
               src={skin.logoUrl}
               alt={skin.name}
               className={logoClass}
               onError={(e) => { e.currentTarget.style.display = 'none' }}
             />
+          ) : (
+            <span className="card-face__bank-name" style={{ color: skin.colors.text }}>
+              {skin.name}
+            </span>
           )}
-          <span className="card-face__bank-name" style={{ color: skin.colors.text }}>
-            {account.name}
-          </span>
         </div>
       </div>
 
+      {/* ── Middle: chip + NFC for physical cards ── */}
       <div className="card-face__middle">
         {showChip && <Chip />}
         {showChip && <Contactless />}
       </div>
 
+      {/* ── Bottom: cardholder name + masked number | balance ── */}
       <div className="card-face__bottom">
         <div className="card-face__bottom-left">
           <div className="card-face__number">
@@ -97,7 +120,11 @@ export default function AccountCard({ account, onSelect }) {
               ? `•••• •••• •••• ${account.lastFour}`
               : `•••• •••• •••• ••••`}
           </div>
-          <div className="card-face__type-label" style={{ color: skin.colors.text, opacity: 0.65 }}>
+          {/* account.name shown as the cardholder name on the card */}
+          <div className="card-face__cardholder" style={{ color: skin.colors.text }}>
+            {account.name}
+          </div>
+          <div className="card-face__type-label" style={{ color: skin.colors.text }}>
             {account.type.toUpperCase()}
           </div>
         </div>
@@ -105,6 +132,16 @@ export default function AccountCard({ account, onSelect }) {
           {format(account.balance ?? 0)}
         </div>
       </div>
+
+      {/* Tap-again hint */}
+      {opened && (
+        <div className="card-face__txn-hint">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 6h8M6 2l4 4-4 4"/>
+          </svg>
+          Tap again for transactions
+        </div>
+      )}
     </div>
   )
 }
