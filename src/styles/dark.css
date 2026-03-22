@@ -1,0 +1,264 @@
+/* ─── Pokit Dark Mode ────────────────────────────────────────────────────────
+   Applied via [data-theme="dark"] on <html>.
+   Every token that changes in dark mode is listed here.
+   Objects get their nighttime equivalents below.
+────────────────────────────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg:             #1A1225;
+  --bg-card:        #2D1F3D;
+  --bg-elevated:    #3A2850;
+  --bg-sunken:      #140E1C;
+  --bg-overlay:     rgba(0, 0, 0, 0.65);
+
+  /* Text */
+  --text:           #F0E6F0;
+  --text-muted:     #A090A0;
+  --text-faint:     #6A5870;
+  --text-on-primary: #FFFFFF;
+
+  /* Brand (slightly brighter for dark bg contrast) */
+  --primary:        #E8899E;
+  --primary-light:  #C46880;
+  --primary-100:    rgba(232, 137, 158, 0.12);
+  --primary-dark:   #F2B5C4;
+
+  --accent:         #E8BC5E;
+  --accent-light:   #C49030;
+  --accent-dark:    #F5D78E;
+
+  /* Borders — lighter on dark */
+  --border:         rgba(240, 230, 240, 0.08);
+  --border-medium:  rgba(240, 230, 240, 0.14);
+  --border-strong:  rgba(240, 230, 240, 0.25);
+
+  /* Semantic */
+  --success-bg:     rgba(76, 175, 80, 0.12);
+  --danger-bg:      rgba(229, 62, 62, 0.12);
+  --warning-bg:     rgba(246, 173, 85, 0.12);
+  --info-bg:        rgba(66, 153, 225, 0.12);
+
+  /* Shadows — deeper and cooler purple */
+  --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.30);
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.40);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.50);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.60);
+  --shadow-inset: inset 0 2px 6px rgba(0, 0, 0, 0.30);
+
+  /* Textures — darker for night */
+  --texture-paper:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 24px,
+      rgba(232, 137, 158, 0.04) 24px,
+      rgba(232, 137, 158, 0.04) 25px
+    );
+
+  --texture-wood:
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 6px,
+      rgba(100, 70, 40, 0.15) 6px,
+      rgba(100, 70, 40, 0.15) 7px
+    );
+}
+
+/* ─── Object nighttime equivalents ──────────────────────────────────────── */
+
+/* Sofa cushion — deep plum at night */
+[data-theme="dark"] .sofa-cushion {
+  background: var(--bg-card);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.20);
+  border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .sofa-cushion::before {
+  background: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(232, 137, 158, 0.10);
+}
+
+/* Sticky notes — dark paper at night */
+[data-theme="dark"] .sticky-note {
+  background-color: #3A3520;
+  color: #E8DFA0;
+}
+
+[data-theme="dark"] .sticky-note--pink {
+  background-color: #3A2028;
+  color: #F0B8C8;
+}
+
+[data-theme="dark"] .sticky-note--blue {
+  background-color: #1A2840;
+  color: #A8C8F0;
+}
+
+[data-theme="dark"] .sticky-note--green {
+  background-color: #1A3020;
+  color: #A8E0B8;
+}
+
+[data-theme="dark"] .sticky-note::before {
+  background: rgba(255, 255, 255, 0.20);
+}
+
+/* Recipe card — dark parchment */
+[data-theme="dark"] .recipe-card {
+  background: #2A2010;
+  border-color: rgba(232, 188, 94, 0.20);
+}
+
+[data-theme="dark"] .recipe-card__title {
+  color: var(--accent-dark);
+}
+
+/* Cutting board — dark walnut */
+[data-theme="dark"] .cutting-board {
+  background-color: #5C3D1A;
+  --texture-wood:
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 6px,
+      rgba(40, 20, 0, 0.20) 6px,
+      rgba(40, 20, 0, 0.20) 7px
+    );
+  background-image: var(--texture-wood);
+}
+
+/* Honey jar / pot — moonlit amber */
+[data-theme="dark"] .honey-jar {
+  background: var(--bg-card);
+  border-color: rgba(232, 188, 94, 0.20);
+}
+
+[data-theme="dark"] .honey-jar__lid {
+  background: linear-gradient(135deg, #7A5A28, #503A10);
+}
+
+[data-theme="dark"] .honey-jar__fill {
+  background: linear-gradient(180deg, rgba(232, 188, 94, 0.4) 0%, rgba(180, 130, 40, 0.65) 100%);
+}
+
+[data-theme="dark"] .honey-pot__fill {
+  background: linear-gradient(180deg, rgba(232, 137, 158, 0.35) 0%, rgba(180, 80, 110, 0.55) 100%);
+}
+
+/* Spiral notebook — dark paper */
+[data-theme="dark"] .spiral-notebook {
+  background: #1E1A18;
+  border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .spiral-notebook__header {
+  background: var(--primary-dark);
+  color: var(--bg);
+}
+
+[data-theme="dark"] .spiral-notebook__row {
+  border-bottom-color: rgba(232, 137, 158, 0.08);
+}
+
+/* Wallet — midnight leather */
+[data-theme="dark"] .wallet {
+  background: #2C1E14;
+  color: #E8D8C0;
+}
+
+[data-theme="dark"] .wallet__amount {
+  color: #E8D8C0;
+}
+
+[data-theme="dark"] .wallet__label {
+  color: rgba(232, 216, 192, 0.55);
+}
+
+/* Corkboard — dark cork at night */
+[data-theme="dark"] .corkboard {
+  background-color: #7A5E30;
+  border-color: #4A3820;
+}
+
+/* Crystal ball — more intense glow in the dark */
+[data-theme="dark"] .crystal-ball {
+  background: radial-gradient(
+    circle at 38% 35%,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(160, 130, 220, 0.6) 25%,
+    rgba(80, 40, 160, 0.8) 65%,
+    rgba(20, 8, 50, 0.95) 100%
+  );
+  box-shadow:
+    0 8px 48px rgba(120, 60, 200, 0.60),
+    inset 0 -8px 16px rgba(20, 8, 50, 0.50),
+    inset 8px 8px 24px rgba(255, 255, 255, 0.12);
+}
+
+/* Drawer — dark walnut */
+[data-theme="dark"] .drawer {
+  background-color: #4A3020;
+  border-color: rgba(100, 60, 20, 0.50);
+}
+
+[data-theme="dark"] .drawer__handle-knob {
+  background: linear-gradient(135deg, #8A6A30, #503820);
+}
+
+[data-theme="dark"] .drawer__content {
+  background: var(--bg-card);
+  border-top-color: rgba(100, 60, 20, 0.25);
+}
+
+/* Receipt roll — aged paper at night */
+[data-theme="dark"] .receipt-roll {
+  background: #1C1A18;
+}
+
+[data-theme="dark"] .receipt-roll::before,
+[data-theme="dark"] .receipt-roll::after {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--bg) 0px,
+    var(--bg) 4px,
+    transparent 4px,
+    transparent 10px
+  );
+}
+
+[data-theme="dark"] .receipt-roll__row {
+  border-bottom-color: rgba(240, 230, 240, 0.06);
+}
+
+/* Form elements in dark */
+[data-theme="dark"] .input {
+  background: var(--bg-sunken);
+  border-color: var(--border-medium);
+  color: var(--text);
+}
+
+[data-theme="dark"] .input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(232, 137, 158, 0.15);
+}
+
+/* Buttons in dark */
+[data-theme="dark"] .btn--primary {
+  background: var(--primary);
+  box-shadow: 0 2px 8px rgba(232, 137, 158, 0.30);
+}
+
+[data-theme="dark"] .btn--secondary {
+  background: var(--primary-100);
+  color: var(--primary-dark);
+  border-color: rgba(196, 104, 128, 0.30);
+}
+
+[data-theme="dark"] .btn--ghost:hover {
+  background: var(--bg-elevated);
+}

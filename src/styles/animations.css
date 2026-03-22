@@ -1,0 +1,208 @@
+/* ─── Pokit Animations ───────────────────────────────────────────────────────
+   Always wrap in prefers-reduced-motion check.
+   Screen transitions: opacity + translateY(16px) + scale(0.98), 350ms ease-out
+   Child stagger: 50ms per child, max 8
+   Jar fill: 1200ms cubic-bezier(0.4, 0, 0.2, 1)
+────────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Keyframes ──────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.90); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.80); }
+  65%  { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%  { transform: rotate(-1.5deg); }
+  75%  { transform: rotate(1.5deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes coinDrop {
+  0%   { transform: translateY(-24px) scale(0.8); opacity: 0; }
+  60%  { transform: translateY(4px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes fillUp {
+  from { height: 0%; }
+  to   { height: var(--fill-target, 50%); }
+}
+
+@keyframes supernova {
+  0%   { transform: scale(1);    opacity: 1; }
+  50%  { transform: scale(1.8);  opacity: 0.8; }
+  100% { transform: scale(3);    opacity: 0; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); max-height: 80px; }
+  to   { opacity: 0; transform: translateX(100%); max-height: 0; }
+}
+
+@keyframes crystalGlow {
+  0%, 100% { box-shadow: 0 8px 32px rgba(100, 60, 160, 0.40); }
+  50%       { box-shadow: 0 8px 48px rgba(100, 60, 160, 0.70); }
+}
+
+/* ─── Utility classes ────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fade-in    { animation: fadeIn    var(--duration-slow) var(--ease-out) both; }
+  .animate-slide-up   { animation: slideUp   var(--duration-slow) var(--ease-out) both; }
+  .animate-slide-down { animation: slideDown var(--duration-base) var(--ease-out) both; }
+  .animate-scale-in   { animation: scaleIn   var(--duration-base) var(--ease-spring) both; }
+  .animate-pop-in     { animation: popIn     var(--duration-slow) var(--ease-spring) both; }
+  .animate-wiggle     { animation: wiggle    0.4s var(--ease-in-out); }
+  .animate-float      { animation: float     3s ease-in-out infinite; }
+  .animate-pulse      { animation: pulse     2s ease-in-out infinite; }
+  .animate-twinkle    { animation: twinkle   2s ease-in-out infinite; }
+
+  /* Screen-level page entrance */
+  .page-enter {
+    animation: slideUp var(--duration-slow) var(--ease-out) both;
+  }
+
+  /* Staggered children — add .stagger-children to parent */
+  .stagger-children > *:nth-child(1) { animation-delay:   0ms; }
+  .stagger-children > *:nth-child(2) { animation-delay:  50ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+  .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+  .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+  .stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+  .stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+
+  /* Skeleton shimmer */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--border) 25%,
+      var(--bg-sunken) 50%,
+      var(--border) 75%
+    );
+    background-size: 200% auto;
+    animation: shimmer 1.4s linear infinite;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Jar fill animation — set --fill-target on the element */
+  .jar-fill-animate {
+    animation: fillUp var(--duration-jar) var(--ease-in-out) forwards;
+  }
+
+  /* Coin drop */
+  .coin-drop {
+    animation: coinDrop 0.5s var(--ease-spring) both;
+  }
+
+  /* Oracle crystal glow */
+  .crystal-glow {
+    animation: crystalGlow 3s ease-in-out infinite;
+  }
+
+  /* Goal supernova */
+  .supernova {
+    animation: supernova 0.8s var(--ease-out) forwards;
+  }
+
+  /* Modal entrance */
+  .modal-enter {
+    animation: modalIn var(--duration-slow) var(--ease-spring) both;
+  }
+
+  /* Toast */
+  .toast-enter { animation: toastIn  var(--duration-base) var(--ease-spring) both; }
+  .toast-exit  { animation: toastOut var(--duration-base) var(--ease-in-out) both; }
+}
+
+/* ─── Reduced motion fallbacks ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-scale-in,
+  .animate-pop-in,
+  .page-enter,
+  .modal-enter,
+  .toast-enter {
+    animation: fadeIn var(--duration-fast) linear both;
+  }
+
+  .animate-float,
+  .animate-pulse,
+  .animate-twinkle,
+  .skeleton,
+  .crystal-glow,
+  .jar-fill-animate {
+    animation: none;
+  }
+
+  /* Jar fill still moves — just no animation */
+  .jar-fill-animate {
+    height: var(--fill-target, 50%);
+  }
+}

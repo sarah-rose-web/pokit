@@ -1,0 +1,218 @@
+/* ─── Graveyard Shift Mode ───────────────────────────────────────────────────
+   Applied via [data-graveyard="true"] on <html>, layered ON TOP of dark mode.
+   Both attributes will be set simultaneously:
+     <html data-theme="dark" data-graveyard="true">
+   Philosophy: warmer, lamplight-style dark. Like working by a desk lamp at 3am.
+   Wood textures go walnut. Sticky notes go dark paper. Cooler purples go warm.
+────────────────────────────────────────────────────────────────────────────── */
+
+[data-graveyard="true"] {
+  /* Warmer backgrounds — amber-tinted instead of cool purple */
+  --bg:             #12100A;
+  --bg-card:        #1E1A10;
+  --bg-elevated:    #2A2416;
+  --bg-sunken:      #0C0A06;
+  --bg-overlay:     rgba(0, 0, 0, 0.70);
+
+  /* Warm text — candlelight white */
+  --text:           #F5EDD0;
+  --text-muted:     #A09070;
+  --text-faint:     #605840;
+
+  /* Primary — warmer rose, less pink */
+  --primary:        #D4845A;
+  --primary-light:  #E8A878;
+  --primary-100:    rgba(212, 132, 90, 0.12);
+  --primary-dark:   #F0B898;
+
+  /* Accent — brighter gold for lamplight */
+  --accent:         #F0C050;
+  --accent-light:   #D4A030;
+  --accent-dark:    #FFE090;
+
+  /* Borders — warm */
+  --border:         rgba(245, 237, 208, 0.06);
+  --border-medium:  rgba(245, 237, 208, 0.12);
+  --border-strong:  rgba(245, 237, 208, 0.22);
+
+  /* Shadows — warm amber glow */
+  --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.50);
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.55), 0 0 1px rgba(240, 192, 80, 0.05);
+  --shadow-md:  0 4px 16px rgba(0, 0, 0, 0.60), 0 0 2px rgba(240, 192, 80, 0.08);
+  --shadow-lg:  0 8px 32px rgba(0, 0, 0, 0.70);
+  --shadow-inset: inset 0 2px 6px rgba(0, 0, 0, 0.40);
+
+  /* Warmer texture lines */
+  --texture-paper:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 24px,
+      rgba(240, 192, 80, 0.04) 24px,
+      rgba(240, 192, 80, 0.04) 25px
+    );
+
+  --texture-wood:
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 5px,
+      rgba(80, 50, 20, 0.20) 5px,
+      rgba(80, 50, 20, 0.20) 6px
+    );
+}
+
+/* ─── Object overrides for graveyard ─────────────────────────────────────── */
+
+/* Sticky notes — dark brown paper, like aged receipts */
+[data-graveyard="true"] .sticky-note {
+  background-color: #2A2010;
+  color: #D4C090;
+  border: 1px solid rgba(240, 192, 80, 0.12);
+}
+
+[data-graveyard="true"] .sticky-note--pink {
+  background-color: #2A1810;
+  color: #E0B090;
+}
+
+[data-graveyard="true"] .sticky-note--blue {
+  background-color: #101820;
+  color: #90B8C8;
+}
+
+[data-graveyard="true"] .sticky-note--green {
+  background-color: #102018;
+  color: #90C8A0;
+}
+
+[data-graveyard="true"] .sticky-note::before {
+  background: rgba(255, 220, 150, 0.18);
+}
+
+/* Sofa cushion — walnut brown */
+[data-graveyard="true"] .sofa-cushion {
+  background: var(--bg-card);
+  border-color: rgba(240, 192, 80, 0.10);
+}
+
+[data-graveyard="true"] .sofa-cushion::before {
+  background: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(212, 132, 90, 0.10);
+}
+
+/* Recipe card — candlelight parchment */
+[data-graveyard="true"] .recipe-card {
+  background: #1E1810;
+  border-color: rgba(240, 192, 80, 0.15);
+}
+
+/* Cutting board — deep walnut */
+[data-graveyard="true"] .cutting-board {
+  background-color: #3A2010;
+}
+
+/* Honey jar — warm amber candlelight */
+[data-graveyard="true"] .honey-jar__lid {
+  background: linear-gradient(135deg, #604020, #382010);
+}
+
+[data-graveyard="true"] .honey-jar__fill {
+  background: linear-gradient(180deg, rgba(240, 192, 80, 0.5) 0%, rgba(180, 120, 30, 0.70) 100%);
+}
+
+[data-graveyard="true"] .honey-pot__fill {
+  background: linear-gradient(180deg, rgba(212, 132, 90, 0.45) 0%, rgba(160, 80, 50, 0.65) 100%);
+}
+
+/* Spiral notebook — deep brown paper */
+[data-graveyard="true"] .spiral-notebook {
+  background: #161208;
+}
+
+[data-graveyard="true"] .spiral-notebook__header {
+  background: #3A2010;
+  color: #D4B080;
+}
+
+[data-graveyard="true"] .spiral-notebook__row {
+  border-bottom-color: rgba(240, 192, 80, 0.06);
+}
+
+/* Wallet — very dark tobacco leather */
+[data-graveyard="true"] .wallet {
+  background: #180E08;
+}
+
+/* Corkboard — dark aged cork */
+[data-graveyard="true"] .corkboard {
+  background-color: #5A3E18;
+  border-color: #301E08;
+}
+
+/* Crystal ball — candlelit, warmer glow */
+[data-graveyard="true"] .crystal-ball {
+  background: radial-gradient(
+    circle at 38% 35%,
+    rgba(255, 240, 200, 0.45) 0%,
+    rgba(200, 140, 80, 0.55) 30%,
+    rgba(120, 60, 20, 0.80) 70%,
+    rgba(30, 15, 5, 0.96) 100%
+  );
+  box-shadow:
+    0 8px 40px rgba(200, 140, 60, 0.40),
+    inset 0 -8px 16px rgba(30, 15, 5, 0.60),
+    inset 8px 8px 24px rgba(255, 220, 150, 0.12);
+}
+
+/* Drawers — walnut wood */
+[data-graveyard="true"] .drawer {
+  background-color: #2E1E0A;
+  border-color: rgba(80, 50, 20, 0.50);
+}
+
+[data-graveyard="true"] .drawer__handle-knob {
+  background: linear-gradient(135deg, #604020, #301808);
+}
+
+[data-graveyard="true"] .drawer__content {
+  background: var(--bg-card);
+}
+
+/* Receipt roll — aged dark paper */
+[data-graveyard="true"] .receipt-roll {
+  background: #141008;
+}
+
+/* Inputs — warm */
+[data-graveyard="true"] .input {
+  background: var(--bg-sunken);
+  border-color: var(--border-medium);
+}
+
+[data-graveyard="true"] .input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(212, 132, 90, 0.15);
+}
+
+/* Bottom nav in graveyard — dim warm glow */
+[data-graveyard="true"] .bottom-nav {
+  background: #1A1408;
+  border-top-color: rgba(240, 192, 80, 0.08);
+}
+
+/* ── Ambient lamplight vignette overlay ───────────────────────────────────
+   Applied to body in graveyard mode — warm radial glow at center.
+   Intensity is subtle — just enough to feel like a desk lamp. ──────────── */
+[data-graveyard="true"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    rgba(240, 192, 80, 0.04) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: var(--z-base);
+}

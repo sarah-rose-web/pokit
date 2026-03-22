@@ -1,0 +1,219 @@
+/* ─── Pokit Design Tokens ───────────────────────────────────────────────────
+   Import order matters: tokens.css must load before all other stylesheets.
+   All values are set on :root (light mode default).
+   Dark mode overrides live in dark.css.
+   Graveyard Shift overrides live in graveyard.css.
+────────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Brand */
+  --primary:          #D4788E;
+  --primary-light:    #F2B5C4;
+  --primary-100:      #FFF0F3;
+  --primary-dark:     #B85C72;
+
+  --accent:           #D4A84B;   /* Gold — money / achievements only */
+  --accent-light:     #F5D78E;
+  --accent-dark:      #A67C2E;
+
+  /* Backgrounds */
+  --bg:               #FFF5F7;
+  --bg-card:          #FFFFFF;
+  --bg-elevated:      #FFFFFF;
+  --bg-sunken:        #F7ECF0;
+  --bg-overlay:       rgba(45, 31, 45, 0.48);
+
+  /* Text */
+  --text:             #2D1F2D;   /* Plum */
+  --text-muted:       #8B7B8B;
+  --text-faint:       #BCA8BC;
+  --text-on-primary:  #FFFFFF;
+  --text-on-accent:   #2D1F2D;
+
+  /* Semantic */
+  --success:          #4CAF50;
+  --success-bg:       #F0FBF0;
+  --danger:           #E53E3E;
+  --danger-bg:        #FFF5F5;
+  --warning:          #F6AD55;
+  --warning-bg:       #FFFBF0;
+  --info:             #4299E1;
+  --info-bg:          #EBF8FF;
+
+  /* Borders */
+  --border:           rgba(45, 31, 45, 0.10);
+  --border-medium:    rgba(45, 31, 45, 0.18);
+  --border-strong:    rgba(45, 31, 45, 0.30);
+
+  /* Radius */
+  --radius:           16px;
+  --radius-cozy:      20px;
+  --radius-sm:        8px;
+  --radius-xs:        4px;
+  --radius-pill:      999px;
+
+  /* Shadows — soft and warm, never cold grey */
+  --shadow-xs:        0 1px 3px rgba(212, 120, 142, 0.08);
+  --shadow-sm:        0 2px 8px rgba(212, 120, 142, 0.12);
+  --shadow-md:        0 4px 16px rgba(212, 120, 142, 0.16);
+  --shadow-lg:        0 8px 32px rgba(212, 120, 142, 0.20);
+  --shadow-inset:     inset 0 2px 6px rgba(45, 31, 45, 0.06);
+
+  /* Typography */
+  --font-ui:          'Quicksand', system-ui, sans-serif;
+  --font-hand:        'Dancing Script', cursive;
+  --font-logo:        'Outfit', sans-serif;
+  --font-mono:        'Fira Code', 'Courier New', monospace;
+
+  --text-xs:          0.75rem;    /* 12px */
+  --text-sm:          0.875rem;   /* 14px */
+  --text-base:        1rem;       /* 16px */
+  --text-md:          1.125rem;   /* 18px */
+  --text-lg:          1.25rem;    /* 20px */
+  --text-xl:          1.5rem;     /* 24px */
+  --text-2xl:         2rem;       /* 32px */
+
+  --weight-normal:    400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+
+  --leading-tight:    1.2;
+  --leading-snug:     1.4;
+  --leading-normal:   1.6;
+  --leading-loose:    1.8;
+
+  /* Spacing */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+
+  /* Layout */
+  --nav-height:       64px;
+  --page-padding:     16px;
+  --page-max-width:   480px;   /* Mobile-first, feels like an app */
+
+  /* Transitions */
+  --ease-out:         cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in-out:      cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast:    150ms;
+  --duration-base:    250ms;
+  --duration-slow:    350ms;
+  --duration-jar:     1200ms;
+
+  /* Z-index scale */
+  --z-base:       0;
+  --z-raised:     10;
+  --z-dropdown:   100;
+  --z-sticky:     200;
+  --z-overlay:    300;
+  --z-modal:      400;
+  --z-toast:      500;
+
+  /* Skeuomorphic texture helpers */
+  --texture-paper:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 24px,
+      rgba(212, 120, 142, 0.04) 24px,
+      rgba(212, 120, 142, 0.04) 25px
+    );
+
+  --texture-wood:
+    repeating-linear-gradient(
+      92deg,
+      transparent,
+      transparent 6px,
+      rgba(180, 130, 80, 0.06) 6px,
+      rgba(180, 130, 80, 0.06) 7px
+    );
+
+  --texture-cork:
+    radial-gradient(circle at 20% 40%, rgba(200, 160, 100, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 70% 20%, rgba(180, 140, 80, 0.10) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(210, 170, 110, 0.12) 0%, transparent 45%);
+}
+
+/* ─── Base reset ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent layout shift when scrollbar appears */
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  overscroll-behavior: none;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  color: var(--text);
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* Loading screen shown before auth resolves */
+.app-loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-loading::after {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-light);
+  border-top-color: var(--primary);
+  animation: spin 0.7s linear infinite;
+}
