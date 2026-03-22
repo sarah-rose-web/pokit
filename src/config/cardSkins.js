@@ -1,60 +1,87 @@
 /**
  * cardSkins.js
- * Dictionary of card skin presets for Philippine banks, e-wallets, and international platforms.
- * Each skin maps to a skinId stored on the account document.
+ * Real card variants for PH banks, e-wallets, and international platforms.
  *
- * @typedef {{ id: string, name: string, category: string, bg: string, text: string }} CardSkin
+ * @typedef {{ id: string, name: string, type: string, colors: { bg: string, text: string }, logoUrl: string | null }} CardSkin
  */
 
 /** @type {CardSkin[]} */
 export const CARD_SKINS = [
-  // ── Local Banks ───────────────────────────────────────
-  { id: 'bdo',         name: 'BDO',          category: 'local', bg: 'linear-gradient(135deg, #8B1A1A 0%, #5C0F0F 100%)',  text: '#fff' },
-  { id: 'bpi',         name: 'BPI',          category: 'local', bg: 'linear-gradient(135deg, #00338D 0%, #001F5C 100%)',  text: '#fff' },
-  { id: 'unionbank',   name: 'UnionBank',    category: 'local', bg: 'linear-gradient(135deg, #1B3A7A 0%, #0F2455 100%)',  text: '#fff' },
-  { id: 'metrobank',   name: 'Metrobank',    category: 'local', bg: 'linear-gradient(135deg, #4A5568 0%, #2D3748 100%)',  text: '#fff' },
-  { id: 'securitybank',name: 'Security Bank',category: 'local', bg: 'linear-gradient(135deg, #C9A227 0%, #8B6914 100%)',  text: '#fff' },
-  { id: 'rcbc',        name: 'RCBC',         category: 'local', bg: 'linear-gradient(135deg, #CC0000 0%, #8B0000 100%)',  text: '#fff' },
-  { id: 'landbank',    name: 'Landbank',     category: 'local', bg: 'linear-gradient(135deg, #2D6A2D 0%, #1A4A1A 100%)',  text: '#fff' },
-  { id: 'pnb',         name: 'PNB',          category: 'local', bg: 'linear-gradient(135deg, #003087 0%, #001F5C 100%)',  text: '#fff' },
-  { id: 'eastwest',    name: 'EastWest',     category: 'local', bg: 'linear-gradient(135deg, #007B7F 0%, #005558 100%)',  text: '#fff' },
-  { id: 'chinabank',   name: 'China Bank',   category: 'local', bg: 'linear-gradient(135deg, #8B0000 0%, #5C0000 100%)',  text: '#fff' },
-  { id: 'psbank',      name: 'PSBank',       category: 'local', bg: 'linear-gradient(135deg, #0057A8 0%, #003D78 100%)',  text: '#fff' },
-  { id: 'pbcom',       name: 'PBCOM',        category: 'local', bg: 'linear-gradient(135deg, #1C2951 0%, #0E1830 100%)',  text: '#fff' },
+  // ── E-wallets & Digital Banks ──────────────────────────
+  { id: 'gcash',         name: 'GCash Mastercard',      type: 'ewallet',       colors: { bg: '#007DFE',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/gcash.com' },
+  { id: 'maya-dark',     name: 'Maya Card (Black)',      type: 'ewallet',       colors: { bg: '#111111',                                                  text: '#00E570' }, logoUrl: 'https://logo.clearbit.com/maya.ph' },
+  { id: 'maya-green',    name: 'Maya Card (Green)',      type: 'ewallet',       colors: { bg: '#00E570',                                                  text: '#111111' }, logoUrl: 'https://logo.clearbit.com/maya.ph' },
+  { id: 'gotyme',        name: 'GoTyme Visa',            type: 'ewallet',       colors: { bg: 'linear-gradient(135deg, #00D1FF 0%, #0047FF 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/gotyme.com.ph' },
+  { id: 'seabank',       name: 'SeaBank Debit',          type: 'ewallet',       colors: { bg: '#FF6B00',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/seabank.ph' },
+  { id: 'tonik',         name: 'Tonik Stash',            type: 'ewallet',       colors: { bg: '#5A2E8A',                                                  text: '#FFCC00' }, logoUrl: 'https://logo.clearbit.com/tonikbank.com' },
 
-  // ── E-wallets ─────────────────────────────────────────
-  { id: 'gcash',       name: 'GCash',        category: 'ewallet', bg: 'linear-gradient(135deg, #007DFF 0%, #0058B8 100%)', text: '#fff' },
-  { id: 'maya',        name: 'Maya',         category: 'ewallet', bg: 'linear-gradient(135deg, #00A878 0%, #007555 100%)', text: '#fff' },
-  { id: 'shoppepay',   name: 'ShopeePay',    category: 'ewallet', bg: 'linear-gradient(135deg, #EE4D2D 0%, #CC3010 100%)', text: '#fff' },
-  { id: 'grabpay',     name: 'GrabPay',      category: 'ewallet', bg: 'linear-gradient(135deg, #00B14F 0%, #007A36 100%)', text: '#fff' },
-  { id: 'coins',       name: 'Coins.ph',     category: 'ewallet', bg: 'linear-gradient(135deg, #6B21A8 0%, #4C1778 100%)', text: '#fff' },
+  // ── BPI ────────────────────────────────────────────────
+  { id: 'bpi-debit',     name: 'BPI Debit Classic',     type: 'local_bank',    colors: { bg: '#B22222',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/bpi.com.ph' },
+  { id: 'bpi-blue',      name: 'BPI Blue Credit',       type: 'local_bank',    colors: { bg: '#003087',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/bpi.com.ph' },
+  { id: 'bpi-gold',      name: 'BPI Gold Credit',       type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%)',         text: '#111111' }, logoUrl: 'https://logo.clearbit.com/bpi.com.ph' },
+  { id: 'bpi-signature', name: 'BPI Visa Signature',    type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #1C1C1C 0%, #000000 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/bpi.com.ph' },
 
-  // ── International ─────────────────────────────────────
-  { id: 'paypal',      name: 'PayPal',       category: 'international', bg: 'linear-gradient(135deg, #003087 0%, #001F5C 100%)', text: '#fff' },
-  { id: 'wise',        name: 'Wise',         category: 'international', bg: 'linear-gradient(135deg, #37B648 0%, #1F7A2A 100%)', text: '#fff' },
-  { id: 'crypto',      name: 'Crypto',       category: 'international', bg: 'linear-gradient(135deg, #26A17B 0%, #1A7055 100%)', text: '#fff' },
+  // ── BDO ────────────────────────────────────────────────
+  { id: 'bdo-debit',     name: 'BDO Debit Classic',     type: 'local_bank',    colors: { bg: '#002A54',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/bdo.com.ph' },
+  { id: 'bdo-emerald',   name: 'BDO Emerald Rewards',   type: 'local_bank',    colors: { bg: '#006B3F',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/bdo.com.ph' },
+  { id: 'bdo-gold',      name: 'BDO Gold Credit',       type: 'local_bank',    colors: { bg: '#C5A059',                                                  text: '#111111' }, logoUrl: 'https://logo.clearbit.com/bdo.com.ph' },
+  { id: 'bdo-platinum',  name: 'BDO Platinum',          type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #7D7D7D 0%, #363636 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/bdo.com.ph' },
 
-  // ── Generic fallbacks ─────────────────────────────────
-  { id: 'cash',        name: 'Cash',         category: 'generic', bg: 'linear-gradient(135deg, #5C7A4E 0%, #3D5235 100%)', text: '#fff' },
-  { id: 'dark',        name: 'Dark',         category: 'generic', bg: 'linear-gradient(135deg, #2C2C2C 0%, #1A1A1A 100%)', text: '#fff' },
-  { id: 'rose',        name: 'Rose',         category: 'generic', bg: 'linear-gradient(135deg, #D4788E 0%, #A84E64 100%)', text: '#fff' },
-  { id: 'gold',        name: 'Gold',         category: 'generic', bg: 'linear-gradient(135deg, #D4A84B 0%, #A07820 100%)', text: '#fff' },
-  { id: 'navy',        name: 'Navy',         category: 'generic', bg: 'linear-gradient(135deg, #2D3561 0%, #1A2040 100%)', text: '#fff' },
-  { id: 'purple',      name: 'Purple',       category: 'generic', bg: 'linear-gradient(135deg, #6B4E8C 0%, #4A3260 100%)', text: '#fff' },
+  // ── UnionBank ──────────────────────────────────────────
+  { id: 'ub-debit',      name: 'UnionBank Debit',       type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #FF6600 0%, #FF6600 48%, #00205B 52%, #00205B 100%)', text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/unionbankph.com' },
+  { id: 'ub-rewards',    name: 'UB Rewards Credit',     type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/unionbankph.com' },
+  { id: 'ub-miles',      name: 'UB Miles+ Credit',      type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #004D40 0%, #000000 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/unionbankph.com' },
+
+  // ── Metrobank ──────────────────────────────────────────
+  { id: 'metro-debit',   name: 'Metrobank Debit',       type: 'local_bank',    colors: { bg: '#0033A0',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/metrobank.com.ph' },
+  { id: 'metro-titan',   name: 'Metrobank Titanium',    type: 'local_bank',    colors: { bg: '#8C92AC',                                                  text: '#111111' }, logoUrl: 'https://logo.clearbit.com/metrobank.com.ph' },
+  { id: 'metro-world',   name: 'Metrobank World',       type: 'local_bank',    colors: { bg: '#0A1128',                                                  text: '#D4AF37' }, logoUrl: 'https://logo.clearbit.com/metrobank.com.ph' },
+
+  // ── RCBC ───────────────────────────────────────────────
+  { id: 'rcbc-debit',    name: 'RCBC MyDebit',          type: 'local_bank',    colors: { bg: '#00205B',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/rcbc.com' },
+  { id: 'rcbc-hexagon',  name: 'RCBC Hexagon Club',     type: 'local_bank',    colors: { bg: '#001A11',                                                  text: '#D4AF37' }, logoUrl: 'https://logo.clearbit.com/rcbc.com' },
+  { id: 'rcbc-flex',     name: 'RCBC Flex Visa',        type: 'local_bank',    colors: { bg: '#008C99',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/rcbc.com' },
+
+  // ── Security Bank ──────────────────────────────────────
+  { id: 'secb-debit',    name: 'Security Bank Debit',   type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #007A33 0%, #004D20 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/securitybank.com' },
+  { id: 'secb-wave',     name: 'Security Bank Wave',    type: 'local_bank',    colors: { bg: 'linear-gradient(135deg, #00B4DB 0%, #0083B0 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/securitybank.com' },
+  { id: 'secb-platinum', name: 'Security Bank Platinum',type: 'local_bank',    colors: { bg: '#A8A9AD',                                                  text: '#111111' }, logoUrl: 'https://logo.clearbit.com/securitybank.com' },
+
+  // ── EastWest ───────────────────────────────────────────
+  { id: 'ew-debit',      name: 'EastWest Debit',        type: 'local_bank',    colors: { bg: '#6A1B9A',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/eastwestbanker.com' },
+  { id: 'ew-platinum',   name: 'EastWest Platinum',     type: 'local_bank',    colors: { bg: '#1C1C1C',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/eastwestbanker.com' },
+
+  // ── Landbank ───────────────────────────────────────────
+  { id: 'landbank',      name: 'Landbank Visa',         type: 'local_bank',    colors: { bg: '#006400',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/landbank.com' },
+
+  // ── International & Freelance ──────────────────────────
+  { id: 'wise',          name: 'Wise',                  type: 'international', colors: { bg: '#9FE870',                                                  text: '#163300' }, logoUrl: 'https://logo.clearbit.com/wise.com' },
+  { id: 'paypal',        name: 'PayPal',                type: 'international', colors: { bg: 'linear-gradient(135deg, #003087 0%, #0079C1 100%)',         text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/paypal.com' },
+  { id: 'payoneer',      name: 'Payoneer',              type: 'international', colors: { bg: '#FF5D00',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/payoneer.com' },
+  { id: 'deel',          name: 'Deel',                  type: 'international', colors: { bg: '#15357A',                                                  text: '#FFFFFF' }, logoUrl: 'https://logo.clearbit.com/deel.com' },
+
+  // ── Generic ────────────────────────────────────────────
+  { id: 'generic-cash',  name: 'Cash',                  type: 'generic',       colors: { bg: 'linear-gradient(135deg, #5C7A4E 0%, #3D5235 100%)',         text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-dark',  name: 'Dark Card',             type: 'generic',       colors: { bg: '#2D3748',                                                  text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-rose',  name: 'Rose',                  type: 'generic',       colors: { bg: 'linear-gradient(135deg, #D4788E 0%, #A84E64 100%)',         text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-gold',  name: 'Gold',                  type: 'generic',       colors: { bg: 'linear-gradient(135deg, #D4A84B 0%, #A07820 100%)',         text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-navy',  name: 'Navy',                  type: 'generic',       colors: { bg: 'linear-gradient(135deg, #2D3561 0%, #1A2040 100%)',         text: '#FFFFFF' }, logoUrl: null },
+  { id: 'generic-light', name: 'Light Card',            type: 'generic',       colors: { bg: '#EDF2F7',                                                  text: '#1A202C' }, logoUrl: null },
 ]
 
 export const SKIN_CATEGORIES = [
-  { id: 'local',         label: 'Local Banks' },
-  { id: 'ewallet',       label: 'E-wallets' },
-  { id: 'international', label: 'International' },
+  { id: 'ewallet',       label: 'E-Wallets & Digital Banks' },
+  { id: 'local_bank',    label: 'Local Banks' },
+  { id: 'international', label: 'International & Freelance' },
   { id: 'generic',       label: 'Generic' },
 ]
 
 /**
- * Look up a skin by id. Falls back to navy if not found.
+ * Look up a skin by id. Falls back to generic-dark if not found.
  * @param {string | null | undefined} skinId
  * @returns {CardSkin}
  */
 export function getSkin(skinId) {
-  return CARD_SKINS.find((s) => s.id === skinId) ?? CARD_SKINS.find((s) => s.id === 'navy')
+  return CARD_SKINS.find((s) => s.id === skinId)
+    ?? CARD_SKINS.find((s) => s.id === 'generic-dark')
 }

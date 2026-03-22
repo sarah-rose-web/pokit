@@ -41,11 +41,24 @@ export default function AccountCard({ account, onEdit, onDelete }) {
   return (
     <div
       className="card-face"
-      style={{ background: skin.bg, color: skin.text }}
+      style={{ background: skin.colors.bg, color: skin.colors.text }}
       data-skin={account.skinId}
     >
       <div className="card-face__top">
-        <span className="card-face__bank-name">{account.name}</span>
+        <div className="card-face__logo-area">
+          {skin.logoUrl
+            ? <img
+                src={skin.logoUrl}
+                alt={skin.name}
+                className="card-face__logo"
+                onError={(e) => { e.currentTarget.style.display = 'none' }}
+              />
+            : null
+          }
+          <span className="card-face__bank-name" style={{ color: skin.colors.text }}>
+            {account.name}
+          </span>
+        </div>
         <div className="card-face__menu">
           <button
             className="card-face__menu-btn"
@@ -80,7 +93,9 @@ export default function AccountCard({ account, onEdit, onDelete }) {
               ? `•••• •••• •••• ${account.lastFour}`
               : `•••• •••• •••• ••••`}
           </div>
-          <div className="card-face__type-label">{skin.name}</div>
+          <div className="card-face__type-label" style={{ color: skin.colors.text, opacity: 0.65 }}>
+            {account.type.toUpperCase()}
+          </div>
         </div>
         <div className="card-face__balance">
           {format(account.balance ?? 0)}

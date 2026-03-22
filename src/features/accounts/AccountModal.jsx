@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import SkinSelector from './SkinSelector'
+import BankSelectorDropdown from './BankSelectorDropdown'
 
 const ACCOUNT_TYPES = [
   { value: 'cash',    label: 'Cash' },
@@ -23,7 +23,7 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
   const [type,     setType]     = useState(account?.type     ?? 'bank')
   const [balance,  setBalance]  = useState(account?.balance  ?? '')
   const [lastFour, setLastFour] = useState(account?.lastFour ?? '')
-  const [skinId,   setSkinId]   = useState(account?.skinId   ?? 'navy')
+  const [skinId,   setSkinId]   = useState(account?.skinId   ?? null)
 
   useEffect(() => {
     if (account) {
@@ -31,9 +31,15 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
       setType(account.type ?? 'bank')
       setBalance(account.balance ?? '')
       setLastFour(account.lastFour ?? '')
-      setSkinId(account.skinId ?? 'navy')
+      setSkinId(account.skinId ?? null)
     }
   }, [account])
+
+  /** Called when user picks a bank — sets skin AND auto-fills name */
+  function handleBankSelect(id, bankName) {
+    setSkinId(id)
+    setName(bankName)
+  }
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -58,14 +64,23 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
         </div>
 
         <form onSubmit={handleSubmit} className="modal__body">
+
+          {/* Bank selector — sets skinId + auto-fills name */}
+          <div className="field">
+            <span className="field__label">Bank / Wallet</span>
+            <BankSelectorDropdown skinId={skinId} onSelect={handleBankSelect} />
+          </div>
+
+          {/* Name — editable after auto-fill */}
           <label className="field">
-            <span className="field__label">Account name</span>
+            <span className="field__label">
+              Account name <span className="field__optional">(auto-filled, tap to edit)</span>
+            </span>
             <input
               className="input"
               placeholder="e.g. BDO Savings"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              autoFocus
               required
             />
           </label>
@@ -114,11 +129,6 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
               />
             </label>
           )}
-
-          <div className="field">
-            <span className="field__label">Card skin</span>
-            <SkinSelector value={skinId} onChange={setSkinId} />
-          </div>
 
           <button
             type="submit"
