@@ -1,1 +1,311 @@
-/* 👛 Bedroom room styles */
+/* 👛 Bedroom — Accounts */
+
+/* ── Net worth jewelry box ─────────────────────────────── */
+.jewelry-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-cozy);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  margin: var(--space-5) var(--space-4) var(--space-4);
+  text-align: center;
+  box-shadow:
+    0 2px 0 var(--border),
+    0 6px 24px rgba(212, 120, 142, 0.07);
+  position: relative;
+  transform: rotate(-0.3deg);
+}
+
+.jewelry-box__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-1);
+}
+
+.jewelry-box__amount {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--text);
+  margin-bottom: var(--space-2);
+  line-height: 1.1;
+}
+
+.jewelry-box__breakdown {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ── Account cards stack ────────────────────────────────── */
+.accounts-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+/* ── Card face (real card proportions 85.6 × 53.98mm = 1.586:1) ── */
+.card-face {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.586;
+  border-radius: 12px;
+  padding: 5% 6%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.08),
+    0 8px 24px rgba(0,0,0,0.18);
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.card-face:nth-child(odd)  { transform: rotate(-0.4deg); }
+.card-face:nth-child(even) { transform: rotate(0.4deg); }
+
+.card-face:active {
+  transform: scale(0.97) rotate(0deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Photo skin overlay for readability */
+.card-face__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0.15) 50%,
+    rgba(0,0,0,0.30) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Top row */
+.card-face__top {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.card-face__bank-name {
+  font-size: clamp(12px, 3.5vw, 16px);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  line-height: 1.2;
+  max-width: 60%;
+}
+
+.card-face__menu {
+  display: flex;
+  gap: 6px;
+}
+
+.card-face__menu-btn {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: background 120ms;
+}
+
+.card-face__menu-btn:hover { background: rgba(255,255,255,0.35); }
+.card-face__menu-btn--danger:hover { background: rgba(229,62,62,0.5); }
+
+/* Middle: chip + NFC */
+.card-face__middle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.card-face__chip {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+  flex-shrink: 0;
+}
+
+.card-face__nfc {
+  color: rgba(255,255,255,0.7);
+}
+
+/* Bottom row */
+.card-face__bottom {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  z-index: 1;
+}
+
+.card-face__bottom-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.card-face__number {
+  font-size: clamp(10px, 3vw, 14px);
+  letter-spacing: 0.18em;
+  font-family: 'Courier New', monospace;
+  opacity: 0.9;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.card-face__type-label {
+  font-size: clamp(9px, 2.5vw, 11px);
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: var(--weight-medium);
+}
+
+.card-face__balance {
+  font-size: clamp(13px, 4vw, 18px);
+  font-weight: var(--weight-bold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  text-align: right;
+  letter-spacing: -0.01em;
+}
+
+/* ── FAB ────────────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-height) + var(--space-4));
+  right: var(--space-5);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 300;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(212, 120, 142, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  z-index: var(--z-sticky);
+}
+
+.fab:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px rgba(212, 120, 142, 0.5);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* ── Modal overrides for compact confirm ────────────────── */
+.modal--compact {
+  padding: var(--space-5);
+  max-width: 280px;
+  text-align: center;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.room__empty {
+  text-align: center;
+  padding: var(--space-10) var(--space-4);
+  color: var(--text-muted);
+}
+
+/* ── Field ───────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.field__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text);
+}
+
+.field__optional {
+  font-weight: var(--weight-regular);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+/* ── Dark mode ───────────────────────────────────────────── */
+[data-theme="dark"] .jewelry-box {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .card--bank    { background: linear-gradient(135deg, #3D4E8A 0%, #2a3660 100%); }
+[data-theme="dark"] .card--cash    { background: linear-gradient(135deg, #6B8C5C 0%, #4d6540 100%); }
+[data-theme="dark"] .card--ewallet { background: linear-gradient(135deg, #7B5EA0 0%, #5a4075 100%); }
+[data-theme="dark"] .card--credit  { background: linear-gradient(135deg, #3C3C3C 0%, #252525 100%); }
+
+/* ── Card skin upload ────────────────────────────────────── */
+.skin-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg-muted);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 120ms, color 120ms;
+}
+
+.skin-upload-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.skin-preview {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 1.586;
+}
+
+.skin-preview__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.skin-preview__remove {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
