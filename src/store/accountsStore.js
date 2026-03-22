@@ -14,7 +14,7 @@ import {
  * @property {'cash'|'bank'|'credit'|'ewallet'} type
  * @property {number}  balance
  * @property {string}  [lastFour]
- * @property {string}  [cardSkin]   — CSS class name for skeuomorphic card style
+ * @property {string}  [skinId]     — id from cardSkins.js config
  * @property {string}  createdAt    — ISO string
  */
 
@@ -48,13 +48,14 @@ export const useAccountsStore = create((set, get) => ({
     set({ accounts: [], loading: true, _unsub: null })
   },
 
-  addAccount: (uid, data) => {
+  addAccount: async (uid, data) => {
     const id = nanoid()
-    return setDocument(uid, 'accounts', id, {
+    await setDocument(uid, 'accounts', id, {
       ...data,
       id,
       createdAt: new Date().toISOString(),
     })
+    return { id }
   },
 
   updateAccount: (uid, id, data) =>
