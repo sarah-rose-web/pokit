@@ -1,143 +1,175 @@
+import { useState }         from 'react'
 import { getSkin }          from '@/config/cardSkins'
 import { useFormatCurrency } from '@/hooks/useFormatCurrency'
 
-function Chip() {
-  return (
-    <svg className="card-face__chip" width="38" height="30" viewBox="0 0 38 30" fill="none">
-      <rect x="1" y="1" width="36" height="28" rx="4" fill="#D4A84B" stroke="#B8902E" strokeWidth="1"/>
-      <rect x="13" y="1" width="12" height="28" fill="#C49A35" opacity="0.5"/>
-      <rect x="1" y="10" width="36" height="10" fill="#C49A35" opacity="0.5"/>
-      <rect x="13" y="10" width="12" height="10" fill="#B8902E" opacity="0.6"/>
-      <line x1="13" y1="1" x2="13" y2="29" stroke="#B8902E" strokeWidth="0.8"/>
-      <line x1="25" y1="1" x2="25" y2="29" stroke="#B8902E" strokeWidth="0.8"/>
-      <line x1="1" y1="10" x2="37" y2="10" stroke="#B8902E" strokeWidth="0.8"/>
-      <line x1="1" y1="20" x2="37" y2="20" stroke="#B8902E" strokeWidth="0.8"/>
-    </svg>
-  )
+const TYPE_LABEL = {
+  cash:    'Cash',
+  bank:    'Bank',
+  ewallet: 'E-Wallet',
+  credit:  'Credit Card',
 }
-
-function Contactless() {
-  return (
-    <svg className="card-face__nfc" width="18" height="20" viewBox="0 0 18 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-      <path d="M9 10c0-1.1.4-2 1.2-2.8" opacity="0.4"/>
-      <path d="M9 10c0-2.2.8-4 2.4-5.6" opacity="0.65"/>
-      <path d="M9 10c0-3.3 1.2-6 3.6-8.4" opacity="0.9"/>
-    </svg>
-  )
-}
-
-const LIGHT_BG_SKINS = new Set(['generic-light', 'generic-gold'])
 
 /**
- * Card in the wallet stack or grid.
- * - Stack hover: CSS translateY(-8px) — works cleanly with uniform z-index
- * - Click: toggles `expanded` class (passed from parent as isExpanded)
- * - Expanded: card pops to front, transactions panel slides in below card content
+ * Builds the inline style for the card-front div.
+ * Priority: real card photo → CSS color/gradient fallback.
+ * When bgImage is set but the file doesn't exist yet, onError swaps to the
+ * CSS fallback automatically — no code change needed when you add a photo later.
+ *
+ * @param {import('@/config/cardSkins').CardSkin} skin
+ * @returns {{ backgroundImage: string, backgroundColor: string, backgroundSize: string, ... }}
+ */
+function buildCardStyle(skin) {
+  if (skin.bgImage) {
+    return {
+      backgroundImage:    `url(${skin.bgImage})`,
+      backgroundColor:    skin.colors.bg.startsWith('linear') ? 'transparent' : skin.colors.bg,
+      backgroundSize:     'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat:   'no-repeat',
+      color:              skin.colors.text ?? '#fff',
+    }
+  }
+  // CSS-only (generic cards + any named card missing its photo)
+  return {
+    background: skin.colors.bg,
+    color:      skin.colors.text ?? '#fff',
+  }
+}
+
+/**
+ * Portrait 3D-flip card for the horizontal wallet carousel.
+ *
+ * Interaction:
+ *   1st tap → focuses card (slides out, fades in balance + last-4)
+ *   2nd tap → flips 3D to show transaction back with Edit / Delete
+ *   tap outside (from parent) → collapses
+ *
+ * Card art: if `/public/card-art/{skinId}.png` exists it is used as the full
+ * card background. Otherwise the skin's CSS color/gradient is the fallback.
+ * The bank logo and watermark are intentionally omitted because the real card
+ * photo already contains them.
  *
  * @param {{
- *   account:    import('@/store/accountsStore').Account,
- *   isExpanded: boolean,
- *   onSelect:   (account: import('@/store/accountsStore').Account) => void,
- *   onEdit:     (account: import('@/store/accountsStore').Account) => void,
- *   onDelete:   (id: string) => void,
+ *   account:   import('@/store/accountsStore').Account,
+ *   isFocused: boolean,
+ *   isFlipped: boolean,
+ *   onClick:   (id: string) => void,
+ *   onEdit:    (account: import('@/store/accountsStore').Account) => void,
+ *   onDelete:  (id: string) => void,
  * }} props
  */
-export default function AccountCard({ account, isExpanded, onSelect, onEdit, onDelete }) {
-  const { format } = useFormatCurrency()
-  const skin       = getSkin(account.skinId)
-  const showChip   = account.type === 'bank' || account.type === 'credit'
-  const logoClass  = LIGHT_BG_SKINS.has(account.skinId)
-    ? 'card-face__logo card-face__logo--dark'
-    : 'card-face__logo'
+export default function AccountCard({ account, isFocused, isFlipped, onClick, onEdit, onDelete }) {
+  const { format }       = useFormatCurrency()
+  const skin             = getSkin(account.skinId)
+  const [imgFailed, setImgFailed] = useState(false)
+
+  // If the card-art image 404s, fall back to CSS immediately
+  const cardStyle = (skin.bgImage && !imgFailed)
+    ? buildCardStyle(skin)
+    : { background: skin.colors.bg, color: skin.colors.text ?? '#fff' }
+
+  // When the real card photo is in use, text needs a stronger shadow for legibility
+  const textShadow = (skin.bgImage && !imgFailed)
+    ? '0 1px 6px rgba(0,0,0,0.7), 0 2px 12px rgba(0,0,0,0.5)'
+    : '0 1px 3px rgba(0,0,0,0.4)'
 
   return (
     <div
-      className={`card-face${isExpanded ? ' expanded' : ''}`}
-      style={{ background: skin.colors.bg, color: skin.colors.text }}
-      data-skin={account.skinId}
-      onClick={() => onSelect(account)}
+      className={`card-scene${isFocused ? ' focused' : ''}${isFlipped ? ' flipped' : ''}`}
+      onClick={() => onClick(account.id)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onSelect(account)}
+      onKeyDown={(e) => e.key === 'Enter' && onClick(account.id)}
       aria-label={`${account.name} — ${format(account.balance ?? 0)}`}
-      aria-expanded={isExpanded}
     >
-      {/* Plastic sheen */}
-      <div className="card-face__overlay" />
+      <div className="card-flipper">
 
-      {/* Watermark */}
-      {skin.logoUrl && (
-        <img src={skin.logoUrl} alt="" className="card-face__watermark" aria-hidden="true" />
-      )}
+        {/* ── FRONT ── */}
+        <div className="card-front" style={cardStyle}>
 
-      {/* ── Top: logo OR skin name ── */}
-      <div className="card-face__top">
-        <div className="card-face__logo-area">
-          {skin.logoUrl ? (
+          {/* Subtle sheen — softens harsh card photos, keeps the premium feel */}
+          <div className="card-front__sheen" />
+
+          {/*
+           * Hidden <img> trick: lets the browser attempt to load the card art.
+           * If it fails, we flip `imgFailed` → component re-renders with CSS fallback.
+           * This means you never see a broken-image icon.
+           */}
+          {skin.bgImage && !imgFailed && (
             <img
-              src={skin.logoUrl}
-              alt={skin.name}
-              className={logoClass}
-              onError={(e) => { e.currentTarget.style.display = 'none' }}
+              src={skin.bgImage}
+              alt=""
+              aria-hidden="true"
+              style={{ display: 'none' }}
+              onError={() => setImgFailed(true)}
             />
-          ) : (
-            <span className="card-face__bank-name" style={{ color: skin.colors.text }}>
-              {skin.name}
-            </span>
           )}
-        </div>
-      </div>
 
-      {/* ── Middle: EMV chip + NFC ── */}
-      <div className="card-face__middle">
-        {showChip && <Chip />}
-        {showChip && <Contactless />}
-      </div>
-
-      {/* ── Bottom: number | cardholder | type  /  balance ── */}
-      <div className="card-face__bottom">
-        <div className="card-face__bottom-left">
-          <div className="card-face__number">
-            {account.lastFour
-              ? `•••• •••• •••• ${account.lastFour}`
-              : `•••• •••• •••• ••••`}
+          {/* Top: account nickname (bank logo is on the photo itself) */}
+          <div className="card-front__top" style={{ textShadow }}>
+            {/* When no real card art: show the bank name as text */}
+            {(!skin.bgImage || imgFailed) && (
+              skin.logoUrl ? (
+                <img
+                  src={skin.logoUrl}
+                  alt={skin.name}
+                  className="card-front__logo"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
+              ) : (
+                <span className="card-front__bank-name">{skin.name}</span>
+              )
+            )}
           </div>
-          <div className="card-face__cardholder" style={{ color: skin.colors.text }}>
+
+          {/* Middle: account nickname */}
+          <div className="card-front__name" style={{ textShadow }}>
             {account.name}
           </div>
-          <div className="card-face__type-label" style={{ color: skin.colors.text }}>
-            {account.type.toUpperCase()}
-          </div>
-        </div>
-        <div className="card-face__balance">
-          {format(account.balance ?? 0)}
-        </div>
-      </div>
 
-      {/* ── Inline transactions panel — shown when expanded ── */}
-      <div className="card-transactions" onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', textShadow: 'none' }}>
-            Recent Transactions
-          </span>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            <button
-              style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '6px', padding: '4px 10px', color: '#fff', fontSize: '11px', cursor: 'pointer' }}
-              onClick={(e) => { e.stopPropagation(); onEdit(account) }}
-            >
-              Edit
-            </button>
-            <button
-              style={{ background: 'rgba(229,62,62,0.3)', border: 'none', borderRadius: '6px', padding: '4px 10px', color: '#fff', fontSize: '11px', cursor: 'pointer' }}
-              onClick={(e) => { e.stopPropagation(); onDelete(account.id) }}
-            >
-              Delete
-            </button>
+          {/* Bottom details — fade in on focus */}
+          <div className="card-front__details">
+            <div className="card-front__balance" style={{ textShadow }}>
+              {format(account.balance ?? 0)}
+            </div>
+            <div className="card-front__number" style={{ textShadow }}>
+              {account.lastFour
+                ? `•••• •••• •••• ${account.lastFour}`
+                : '•••• •••• •••• ••••'}
+            </div>
+            <div className="card-front__type" style={{ textShadow }}>
+              {TYPE_LABEL[account.type] ?? account.type}
+            </div>
+          </div>
+
+          <span className="card-front__flip-hint">tap again to flip ↺</span>
+        </div>
+
+        {/* ── BACK ── */}
+        <div className="card-back" onClick={(e) => e.stopPropagation()}>
+          <div className="card-back__header">
+            <span>Transactions</span>
+            <div className="card-back__actions">
+              <button
+                className="card-back__btn card-back__btn--edit"
+                onClick={(e) => { e.stopPropagation(); onEdit(account) }}
+              >
+                Edit
+              </button>
+              <button
+                className="card-back__btn card-back__btn--delete"
+                onClick={(e) => { e.stopPropagation(); onDelete(account.id) }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <div className="card-back__tx-list">
+            <p className="card-back__empty">No recent transactions yet.</p>
           </div>
         </div>
-        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', textShadow: 'none' }}>
-          No recent transactions yet.
-        </p>
+
       </div>
     </div>
   )

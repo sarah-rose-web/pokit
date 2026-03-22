@@ -4,6 +4,7 @@ import { useAccountsStore }      from '@/store/accountsStore'
 import { useFormatCurrency }     from '@/hooks/useFormatCurrency'
 import BottomNav    from '@/components/BottomNav'
 import AccountCard  from './AccountCard'
+import WalletTile   from './WalletTile'
 import AccountModal from './AccountModal'
 import './accounts.css'
 
@@ -22,8 +23,10 @@ export default function AccountsPage() {
   const { format } = useFormatCurrency()
 
   const [filterType,    setFilterType]    = useState('all')
-  const [viewMode,      setViewMode]      = useState('stack') // 'stack' | 'grid'
-  const [expandedId,    setExpandedId]    = useState(null)    // which card is expanded inline
+  const [viewMode,      setViewMode]      = useState('stack') // 'stack' | 'grid' | 'tile'
+  const [focusedId,     setFocusedId]     = useState(null)    // focused card in carousel
+  const [flippedId,     setFlippedId]     = useState(null)    // flipped card in carousel
+  const [expandedId,    setExpandedId]    = useState(null)    // kept for grid/tile compat
   const [modal,         setModal]         = useState(null)    // null | 'add' | account object
   const [saving,        setSaving]        = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(null)    // account id
@@ -33,8 +36,22 @@ export default function AccountsPage() {
     return () => unsubscribe()
   }, [user])
 
-  // Collapse any expanded card when filter or view changes
-  useEffect(() => { setExpandedId(null) }, [filterType, viewMode])
+  // Collapse everything when filter or view changes
+  useEffect(() => {
+    setExpandedId(null)
+    setFocusedId(null)
+    setFlippedId(null)
+  }, [filterType, viewMode])
+
+  /** Carousel tap handler: 1st tap focuses, 2nd tap flips */
+  function handleCardClick(id) {
+    if (focusedId !== id) {
+      setFocusedId(id)
+      setFlippedId(null)
+    } else {
+      setFlippedId((prev) => prev === id ? null : id)
+    }
+  }
 
   // Net worth
   const assets = accounts
@@ -51,11 +68,6 @@ export default function AccountsPage() {
   const visible = filterType === 'all'
     ? accounts
     : accounts.filter((a) => a.type === filterType)
-
-  /** Toggle inline expansion. Clicking the already-expanded card collapses it. */
-  function handleCardSelect(account) {
-    setExpandedId((prev) => prev === account.id ? null : account.id)
-  }
 
   async function handleSave(data) {
     if (!user) return
@@ -80,7 +92,7 @@ export default function AccountsPage() {
 
   return (
     <>
-      <main className="room page-enter" onClick={() => setExpandedId(null)}>
+      <main className="room room--bedroom page-enter" onClick={() => { setExpandedId(null); setFocusedId(null); setFlippedId(null) }}>
         <h1 className="room__title">Bedroom</h1>
 
         {/* Net worth jewelry box */}
@@ -133,6 +145,19 @@ export default function AccountsPage() {
                   <rect x="1" y="10"  width="12" height="3"   rx="1"/>
                 </svg>
               </button>
+              <button
+                className={`view-btn${viewMode === 'tile' ? ' view-btn--active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setViewMode('tile') }}
+                title="Wallet tiles"
+              >
+                {/* 2x2 grid icon */}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <rect x="1"   y="1"   width="5" height="5" rx="1"/>
+                  <rect x="8"   y="1"   width="5" height="5" rx="1"/>
+                  <rect x="1"   y="8"   width="5" height="5" rx="1"/>
+                  <rect x="8"   y="8"   width="5" height="5" rx="1"/>
+                </svg>
+              </button>
             </div>
           </>
         )}
@@ -155,18 +180,42 @@ export default function AccountsPage() {
           </div>
         ) : (
           <div
-            className={viewMode === 'stack' ? 'accounts-stack' : 'accounts-grid'}
+            className={
+              viewMode === 'stack' ? 'accounts-stack'
+              : viewMode === 'tile' ? 'accounts-tiles'
+              : 'accounts-grid'
+            }
             onClick={(e) => e.stopPropagation()}
           >
             {visible.map((acc) => (
-              <AccountCard
-                key={acc.id}
-                account={acc}
-                isExpanded={expandedId === acc.id}
-                onSelect={handleCardSelect}
-                onEdit={(a) => setModal(a)}
-                onDelete={(id) => setConfirmDelete(id)}
-              />
+              viewMode === 'tile' ? (
+                <WalletTile
+                  key={acc.id}
+                  account={acc}
+                  onSelect={(a) => setModal(a)}
+                />
+              ) : viewMode === 'stack' ? (
+                <AccountCard
+                  key={acc.id}
+                  account={acc}
+                  isFocused={focusedId === acc.id}
+                  isFlipped={flippedId === acc.id}
+                  onClick={handleCardClick}
+                  onEdit={(a) => setModal(a)}
+                  onDelete={(id) => setConfirmDelete(id)}
+                />
+              ) : (
+                /* grid mode — still uses AccountCard but in grid container */
+                <AccountCard
+                  key={acc.id}
+                  account={acc}
+                  isFocused={false}
+                  isFlipped={false}
+                  onClick={() => setModal(acc)}
+                  onEdit={(a) => setModal(a)}
+                  onDelete={(id) => setConfirmDelete(id)}
+                />
+              )
             ))}
           </div>
         )}

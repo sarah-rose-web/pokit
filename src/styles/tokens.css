@@ -60,7 +60,8 @@
   --shadow-inset:     inset 0 2px 6px rgba(45, 31, 45, 0.06);
 
   /* Typography */
-  --font-ui:          'Quicksand', system-ui, sans-serif;
+  --font-ui:          'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display:     'Quicksand', system-ui, sans-serif; /* kept for cozy display moments */
   --font-hand:        'Dancing Script', cursive;
   --font-logo:        'Outfit', sans-serif;
   --font-mono:        'Fira Code', 'Courier New', monospace;
@@ -73,10 +74,12 @@
   --text-xl:          1.5rem;     /* 24px */
   --text-2xl:         2rem;       /* 32px */
 
+  --weight-regular:   400;
   --weight-normal:    400;
   --weight-medium:    500;
   --weight-semibold:  600;
   --weight-bold:      700;
+  --weight-black:     800;
 
   --leading-tight:    1.2;
   --leading-snug:     1.4;

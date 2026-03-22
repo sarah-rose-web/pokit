@@ -31,6 +31,21 @@ export function getFileUrl(path) {
 }
 
 /**
+ * Upload a card skin image for an account.
+ * @param {string} uid
+ * @param {string} accountId
+ * @param {File} file
+ * @returns {Promise<string>} download URL
+ */
+export async function uploadCardSkin(uid, accountId, file) {
+  const ext = file.name.split('.').pop()
+  const path = `users/${uid}/card-skins/${accountId}.${ext}`
+  const storageRef = ref(storage, path)
+  await uploadBytes(storageRef, file)
+  return getDownloadURL(storageRef)
+}
+
+/**
  * Delete a file by its storage path.
  * @param {string} path
  * @returns {Promise<void>}
