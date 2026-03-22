@@ -64,7 +64,7 @@ jobs:
       - name: Deploy Firestore + Storage rules
         run: |
           npx firebase-tools@latest deploy \
-            --only firestore:rules,firestore:indexes \
+--only firestore:rules,firestore:indexes \            --only firestore:rules,firestore:indexes,storage \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
             --token ${{ secrets.FIREBASE_TOKEN }} \
             --non-interactive
