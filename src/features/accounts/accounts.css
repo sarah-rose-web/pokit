@@ -13,8 +13,8 @@
   padding-right: 0;
 }
 
-/* Restore side padding for everything inside the room EXCEPT the carousel */
-.room--bedroom > *:not(.accounts-stack):not(.accounts-grid):not(.accounts-tiles) {
+/* Restore side padding for everything inside the room EXCEPT the card views */
+.room--bedroom > *:not(.accounts-stack):not(.accounts-tiles) {
   padding-left: var(--page-padding, var(--space-4));
   padding-right: var(--page-padding, var(--space-4));
 }
@@ -122,7 +122,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vw;
+  width: 100%;
   padding: var(--space-6) var(--space-4) var(--space-10);
   gap: 0;
   overflow-x: hidden;
@@ -139,6 +139,7 @@
   /* Vertical overlap — reveals just the bottom edge of each card */
   margin-bottom: -140px;
   z-index: 1;
+  position: relative;
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
 }
@@ -179,8 +180,10 @@
 .card-front, .card-back {
   position: absolute;
   inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  /* backface-visibility: hidden removed — it causes Chrome to cache a "don't paint"
+     decision when the parent (main.page-enter) starts at opacity:0, making cards
+     invisible until a forced repaint. visibility: hidden on .card-back + the
+     .flipped state rules handle face-switching instead. */
   border-radius: 12px; /* realistic card corner */
   padding: 16px 20px;
   box-shadow:
@@ -202,7 +205,15 @@
   border: 1px solid rgba(0,0,0,0.07);
   transform: rotateY(180deg);
   color: var(--text);
+  /* overflow:auto on .room--bedroom flattens preserve-3d, making backface-visibility
+     a no-op. card-back would then render on top of card-front (same bg as page = invisible).
+     Force it hidden explicitly and only reveal it when the card is actually flipped. */
+  visibility: hidden;
 }
+
+/* Flip state: show back, hide front */
+.card-scene.flipped .card-back  { visibility: visible; }
+.card-scene.flipped .card-front { visibility: hidden; }
 
 /* ── Plastic sheen on front ── */
 .card-front__sheen {
@@ -236,23 +247,9 @@
 
 /* ── Front layout — Landscape ── */
 
-/* Account nickname — vertically centered in the middle of the card */
-.card-front__name {
+/* Spacer — pushes details to the bottom on the clean card front */
+.card-front__spacer {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: var(--weight-bold);
-  line-height: 1.2;
-  text-align: center;
-  position: relative;
-  z-index: 4; /* above sheen */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  padding: 0 8px;
 }
 
 /* Bottom details — fades in on focus, glassmorphism backdrop for legibility */
@@ -314,6 +311,25 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
+/* ── Centred nickname on card front ── */
+.card-front__name {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 15px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.01em;
+  color: inherit;
+  z-index: 4;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+  pointer-events: none;
+}
+
 /* ── "Tap to flip" hint on focused card ── */
 .card-front__flip-hint {
   display: none;
@@ -371,6 +387,16 @@
   color: var(--text);
 }
 
+.card-back__account-name {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
 .card-back__actions {
   display: flex;
   gap: 6px;
@@ -398,75 +424,47 @@
   color: var(--danger);
 }
 
-.card-back__tx-list {
+/* Two-section body */
+.card-back__body {
   flex: 1;
-  overflow-y: auto;
-  scrollbar-width: none;
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.card-back__section {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  min-height: 0;
 }
+.card-back__section::-webkit-scrollbar { display: none; }
 
-.card-back__tx-list::-webkit-scrollbar { display: none; }
-
-.card-back__tx-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-}
-
-.card-back__tx-name {
-  font-weight: var(--weight-medium);
-  color: var(--text);
-}
-
-.card-back__tx-date {
-  color: var(--text-muted);
-  font-size: 10px;
-  margin-top: 2px;
-}
-
-.card-back__tx-amount {
+.card-back__section-label {
+  font-size: 9px;
   font-weight: var(--weight-bold);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.card-back__divider {
+  width: 1px;
+  background: rgba(0,0,0,0.08);
+  margin: 0 10px;
+  flex-shrink: 0;
 }
 
 .card-back__empty {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
-  text-align: center;
-  margin-top: var(--space-4);
+  font-style: italic;
 }
-
-/* ── Grid/List Mode (True Responsive Grid) ── */
-.accounts-grid {
-  display: grid;
-  /* 220px = card-scene width — no stretching beyond that */
-  grid-template-columns: repeat(auto-fill, minmax(220px, 240px));
-  gap: var(--space-5);
-  padding: var(--space-4) var(--space-4) var(--space-10);
-  justify-content: center; /* center the grid when there's leftover space */
-  align-items: start;
-}
-
-/* card-scene in grid: fixed portrait size, no stretching */
-.accounts-grid .card-scene {
-  width: 300px;
-  aspect-ratio: 85.60 / 53.98;
-  margin-right: 0 !important;
-  margin-left:  0 !important;
-}
-
-/* Widen grid columns to fit landscape cards */
-.accounts-grid {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 320px));
-}
-
-/* ── card-face kept as no-op for grid/detail-drawer compat ── */
-.card-face { display: none; }
 
 /* ── FAB ────────────────────────────────────────────────── */
 .fab {
@@ -531,6 +529,137 @@
   font-weight: var(--weight-regular);
   color: var(--text-muted);
   font-size: var(--text-xs);
+}
+
+/* ── Static card face (used in AccountDetailDrawer) ────────── */
+/* Mirrors the card-front layout but as a standalone read-only card */
+.card-face {
+  position: relative;
+  border-radius: 12px;
+  aspect-ratio: 85.60 / 53.98;
+  padding: 16px 20px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.12),
+    0 12px 28px rgba(0,0,0,0.18);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.card-face__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.12) 0%,
+    rgba(255,255,255,0) 40%,
+    rgba(0,0,0,0.08) 65%,
+    rgba(0,0,0,0.35) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.card-face__watermark {
+  position: absolute;
+  right: -15%;
+  bottom: -30%;
+  height: 170%;
+  width: auto;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.card-face__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.card-face__logo-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-face__logo {
+  height: 22px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.card-face__logo--dark {
+  filter: none;
+}
+
+.card-face__bank-name {
+  font-size: 13px;
+  font-weight: var(--weight-bold);
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.card-face__middle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.card-face__chip {
+  /* size comes from SVG width/height attrs (38×30) */
+  flex-shrink: 0;
+}
+
+.card-face__nfc {
+  opacity: 0.7;
+}
+
+.card-face__bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.card-face__bottom-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.card-face__number {
+  font-size: 11px;
+  letter-spacing: 2px;
+  opacity: 0.85;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.card-face__type-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.card-face__balance {
+  font-size: 18px;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.7);
 }
 
 /* ── Account detail drawer ───────────────────────────────── */
@@ -790,17 +919,56 @@
   filter: brightness(0.97);
 }
 
+/* Top row: icon + action buttons */
+.wallet-tile__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
 /* Icon box — uses skin bg color, shows logo */
 .wallet-tile__icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--space-2);
   overflow: hidden;
   flex-shrink: 0;
+}
+
+/* Edit + Delete icon buttons on the tile */
+.wallet-tile__actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.wallet-tile__action-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 120ms, color 120ms;
+  padding: 0;
+}
+
+.wallet-tile__action-btn:hover {
+  background: var(--bg-muted, #f0f0f0);
+  color: var(--text);
+}
+
+.wallet-tile__action-btn--danger:hover {
+  background: rgba(229,62,62,0.10);
+  color: var(--danger);
 }
 
 .wallet-tile__logo {
@@ -828,19 +996,13 @@
 }
 
 .wallet-tile__name {
-  font-size: var(--text-sm, 13px);
+  font-size: var(--text-xs, 11px);
   font-weight: var(--weight-medium, 500);
-  color: var(--text);
+  color: var(--text-muted);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.wallet-tile__type {
-  font-size: var(--text-xs, 11px);
-  color: var(--text-muted);
-  margin: 0;
 }
 
 /* Dark mode */

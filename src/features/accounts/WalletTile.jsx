@@ -1,57 +1,78 @@
 import { getSkin }          from '@/config/cardSkins'
 import { useFormatCurrency } from '@/hooks/useFormatCurrency'
 
-const TYPE_LABEL = {
-  cash:    'Cash',
-  bank:    'Bank',
-  ewallet: 'E-Wallet',
-  credit:  'Credit',
-}
-
 /**
  * Compact wallet tile for the 2-column tile grid view.
- * Shows: logo icon, balance, account name, type label.
+ * Shows: logo icon + balance. Edit / Delete icon buttons on top-right.
+ * Main click → opens the detail drawer (onOpen).
  *
  * @param {{
  *   account:  import('@/store/accountsStore').Account,
- *   onSelect: (account: import('@/store/accountsStore').Account) => void,
+ *   onOpen:   (account: import('@/store/accountsStore').Account) => void,
+ *   onEdit:   (account: import('@/store/accountsStore').Account) => void,
+ *   onDelete: (id: string) => void,
  * }} props
  */
-export default function WalletTile({ account, onSelect }) {
+export default function WalletTile({ account, onOpen, onEdit, onDelete }) {
   const { format } = useFormatCurrency()
   const skin       = getSkin(account.skinId)
 
   return (
     <div
       className="wallet-tile"
-      onClick={() => onSelect(account)}
+      onClick={() => onOpen(account)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onSelect(account)}
+      onKeyDown={(e) => e.key === 'Enter' && onOpen(account)}
       aria-label={`${account.name} — ${format(account.balance ?? 0)}`}
     >
-      {/* Icon box */}
-      <div className="wallet-tile__icon" style={{ background: skin.colors.bg }}>
-        {skin.logoUrl ? (
-          <img
-            src={skin.logoUrl}
-            alt={skin.name}
-            className="wallet-tile__logo"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
-          />
-        ) : (
-          <span className="wallet-tile__icon-fallback">
-            {account.name.charAt(0).toUpperCase()}
-          </span>
-        )}
+      {/* Top row: icon + action buttons */}
+      <div className="wallet-tile__top">
+        <div className="wallet-tile__icon" style={{ background: skin.colors.bg }}>
+          {skin.logoUrl ? (
+            <img
+              src={skin.logoUrl}
+              alt={skin.name}
+              className="wallet-tile__logo"
+              onError={(e) => { e.currentTarget.style.display = 'none' }}
+            />
+          ) : (
+            <span className="wallet-tile__icon-fallback">
+              {account.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+        </div>
+
+        <div className="wallet-tile__actions" onClick={(e) => e.stopPropagation()}>
+          {/* Edit */}
+          <button
+            className="wallet-tile__action-btn"
+            onClick={() => onEdit(account)}
+            aria-label="Edit account"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 1.5l2.5 2.5L3.5 11H1v-2.5L8 1.5Z"/>
+            </svg>
+          </button>
+
+          {/* Delete */}
+          <button
+            className="wallet-tile__action-btn wallet-tile__action-btn--danger"
+            onClick={() => onDelete(account.id)}
+            aria-label="Delete account"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1.5 3h9M4 3V2h4v1M4.5 5v3.5M7.5 5v3.5M2.5 3l.6 6.2a.8.8 0 0 0 .8.8h4.2a.8.8 0 0 0 .8-.8L9.5 3"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Balance */}
       <p className="wallet-tile__balance">{format(account.balance ?? 0)}</p>
 
-      {/* Name + type */}
+      {/* Account name (single line, truncated) */}
       <p className="wallet-tile__name">{account.name}</p>
-      <p className="wallet-tile__type">{TYPE_LABEL[account.type] ?? account.type}</p>
     </div>
   )
 }

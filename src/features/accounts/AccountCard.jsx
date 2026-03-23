@@ -77,7 +77,7 @@ export default function AccountCard({ account, isFocused, isFlipped, onClick, on
     >
       <div className="card-flipper">
 
-        {/* ── FRONT ── */}
+        {/* ── FRONT ── clean — card art only ── */}
         <div className="card-front" style={cardStyle}>
 
           {/* Plastic sheen — z-index 3, border-radius: inherit */}
@@ -94,10 +94,8 @@ export default function AccountCard({ account, isFocused, isFlipped, onClick, on
             />
           )}
 
-          {/* Account nickname — vertically centred in the card middle */}
-          <div className="card-front__name" style={{ textShadow }}>
-            {account.name}
-          </div>
+          {/* Spacer pushes details to the bottom */}
+          <div className="card-front__spacer" />
 
           {/* Balance + card number — pinned to bottom, fades in on focus
               Glassmorphism backdrop ensures legibility over any card art    */}
@@ -122,19 +120,11 @@ export default function AccountCard({ account, isFocused, isFlipped, onClick, on
 
         {/* ── BACK ── */}
         <div className="card-back" onClick={(e) => e.stopPropagation()}>
+
+          {/* Header: bank identity + edit/delete */}
           <div className="card-back__header">
-            {/* Bank name moved here so the front stays clean */}
             <div className="card-back__bank">
-              {skin.logoUrl ? (
-                <img
-                  src={skin.logoUrl}
-                  alt={skin.name}
-                  className="card-back__bank-logo"
-                  onError={(e) => { e.currentTarget.style.display = 'none' }}
-                />
-              ) : (
-                <span className="card-back__bank-name">{skin.name}</span>
-              )}
+              <span className="card-back__account-name">{account.name}</span>
             </div>
             <div className="card-back__actions">
               <button
@@ -152,8 +142,24 @@ export default function AccountCard({ account, isFocused, isFlipped, onClick, on
             </div>
           </div>
 
-          <div className="card-back__tx-list">
-            <p className="card-back__empty">No recent transactions yet.</p>
+          {/* Two-section body */}
+          <div className="card-back__body">
+
+            {/* Section 1 — Transaction History */}
+            <div className="card-back__section">
+              <p className="card-back__section-label">Recent</p>
+              <p className="card-back__empty">No transactions yet.</p>
+            </div>
+
+            {/* Divider */}
+            <div className="card-back__divider" />
+
+            {/* Section 2 — Savings */}
+            <div className="card-back__section">
+              <p className="card-back__section-label">Savings</p>
+              <p className="card-back__empty">No goals linked.</p>
+            </div>
+
           </div>
         </div>
 

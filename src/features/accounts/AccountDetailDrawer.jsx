@@ -97,9 +97,11 @@ export default function AccountDetailDrawer({ account, onEdit, onDelete, onClose
           <StaticCard account={account} />
         </div>
 
-        {/* Scrollable transaction list */}
+        {/* Scrollable body — two sections */}
         <div className="detail-drawer__scroll">
-          <p className="detail-drawer__section-title">Transactions</p>
+
+          {/* Section 1: Transaction History */}
+          <p className="detail-drawer__section-title">Transaction History</p>
 
           {loading ? (
             <p className="detail-empty">Loading…</p>
@@ -117,6 +119,11 @@ export default function AccountDetailDrawer({ account, onEdit, onDelete, onClose
               </div>
             ))
           )}
+
+          {/* Section 2: Savings */}
+          <p className="detail-drawer__section-title" style={{ marginTop: 'var(--space-6)' }}>Savings</p>
+          <p className="detail-empty">No savings goals linked to this account yet.</p>
+
         </div>
       </div>
     </div>
@@ -185,9 +192,6 @@ function StaticCard({ account }) {
               onError={(e) => { e.currentTarget.style.display = 'none' }}
             />
           )}
-          <span className="card-face__bank-name" style={{ color: skin.colors.text }}>
-            {account.name}
-          </span>
         </div>
       </div>
 

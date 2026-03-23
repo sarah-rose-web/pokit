@@ -2,10 +2,11 @@ import { useEffect, useState }  from 'react'
 import { useAuthStore }          from '@/store/authStore'
 import { useAccountsStore }      from '@/store/accountsStore'
 import { useFormatCurrency }     from '@/hooks/useFormatCurrency'
-import BottomNav    from '@/components/BottomNav'
-import AccountCard  from './AccountCard'
-import WalletTile   from './WalletTile'
-import AccountModal from './AccountModal'
+import BottomNav             from '@/components/BottomNav'
+import AccountCard           from './AccountCard'
+import WalletTile            from './WalletTile'
+import AccountDetailDrawer   from './AccountDetailDrawer'
+import AccountModal          from './AccountModal'
 import './accounts.css'
 
 const FILTERS = [
@@ -23,27 +24,27 @@ export default function AccountsPage() {
   const { format } = useFormatCurrency()
 
   const [filterType,    setFilterType]    = useState('all')
-  const [viewMode,      setViewMode]      = useState('stack') // 'stack' | 'grid' | 'tile'
-  const [focusedId,     setFocusedId]     = useState(null)    // focused card in carousel
-  const [flippedId,     setFlippedId]     = useState(null)    // flipped card in carousel
-  const [expandedId,    setExpandedId]    = useState(null)    // kept for grid/tile compat
-  const [modal,         setModal]         = useState(null)    // null | 'add' | account object
+  const [viewMode,      setViewMode]      = useState('wallet') // 'wallet' | 'tile'
+  const [focusedId,     setFocusedId]     = useState(null)     // wallet: focused card
+  const [flippedId,     setFlippedId]     = useState(null)     // wallet: flipped card
+  const [detailAccount, setDetailAccount] = useState(null)     // tile: drawer target
+  const [modal,         setModal]         = useState(null)     // null | 'add' | account
   const [saving,        setSaving]        = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(null)    // account id
+  const [confirmDelete, setConfirmDelete] = useState(null)     // account id
 
   useEffect(() => {
     if (user) subscribe(user.uid)
     return () => unsubscribe()
   }, [user])
 
-  // Collapse everything when filter or view changes
+  // Reset all interaction state when filter or view changes
   useEffect(() => {
-    setExpandedId(null)
     setFocusedId(null)
     setFlippedId(null)
+    setDetailAccount(null)
   }, [filterType, viewMode])
 
-  /** Carousel tap handler: 1st tap focuses, 2nd tap flips */
+  /** Wallet view: 1st tap focuses, 2nd tap flips */
   function handleCardClick(id) {
     if (focusedId !== id) {
       setFocusedId(id)
@@ -64,7 +65,6 @@ export default function AccountsPage() {
 
   const netWorth = assets - creditDebt
 
-  // Filtered list
   const visible = filterType === 'all'
     ? accounts
     : accounts.filter((a) => a.type === filterType)
@@ -90,9 +90,17 @@ export default function AccountsPage() {
     setConfirmDelete(null)
   }
 
+  function collapseAll() {
+    setFocusedId(null)
+    setFlippedId(null)
+  }
+
   return (
     <>
-      <main className="room room--bedroom page-enter" onClick={() => { setExpandedId(null); setFocusedId(null); setFlippedId(null) }}>
+      <main
+        className="room room--bedroom page-enter"
+        onClick={collapseAll}
+      >
         <h1 className="room__title">Bedroom</h1>
 
         {/* Net worth jewelry box */}
@@ -105,7 +113,7 @@ export default function AccountsPage() {
           </div>
         </div>
 
-        {/* Filter tabs + view toggle */}
+        {/* Filter pills + view toggle */}
         {accounts.length > 0 && (
           <>
             <div className="accounts-filters">
@@ -121,48 +129,37 @@ export default function AccountsPage() {
             </div>
 
             <div className="view-toggle">
+              {/* Wallet (stack) view */}
               <button
-                className={`view-btn${viewMode === 'stack' ? ' view-btn--active' : ''}`}
-                onClick={(e) => { e.stopPropagation(); setViewMode('stack') }}
+                className={`view-btn${viewMode === 'wallet' ? ' view-btn--active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setViewMode('wallet') }}
                 title="Wallet stack"
               >
-                {/* stacked lines icon */}
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-                  <rect x="1" y="1" width="12" height="3.5" rx="1"/>
-                  <rect x="1" y="5.5" width="12" height="3.5" rx="1" opacity="0.6"/>
-                  <rect x="1" y="10" width="12" height="3" rx="1" opacity="0.35"/>
-                </svg>
-              </button>
-              <button
-                className={`view-btn${viewMode === 'grid' ? ' view-btn--active' : ''}`}
-                onClick={(e) => { e.stopPropagation(); setViewMode('grid') }}
-                title="List view"
-              >
-                {/* list icon */}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
                   <rect x="1" y="1"   width="12" height="3.5" rx="1"/>
-                  <rect x="1" y="5.5" width="12" height="3.5" rx="1"/>
-                  <rect x="1" y="10"  width="12" height="3"   rx="1"/>
+                  <rect x="1" y="5.5" width="12" height="3.5" rx="1" opacity="0.6"/>
+                  <rect x="1" y="10"  width="12" height="3"   rx="1" opacity="0.35"/>
                 </svg>
               </button>
+
+              {/* Tile view */}
               <button
                 className={`view-btn${viewMode === 'tile' ? ' view-btn--active' : ''}`}
                 onClick={(e) => { e.stopPropagation(); setViewMode('tile') }}
-                title="Wallet tiles"
+                title="Tile view"
               >
-                {/* 2x2 grid icon */}
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-                  <rect x="1"   y="1"   width="5" height="5" rx="1"/>
-                  <rect x="8"   y="1"   width="5" height="5" rx="1"/>
-                  <rect x="1"   y="8"   width="5" height="5" rx="1"/>
-                  <rect x="8"   y="8"   width="5" height="5" rx="1"/>
+                  <rect x="1" y="1" width="5" height="5" rx="1"/>
+                  <rect x="8" y="1" width="5" height="5" rx="1"/>
+                  <rect x="1" y="8" width="5" height="5" rx="1"/>
+                  <rect x="8" y="8" width="5" height="5" rx="1"/>
                 </svg>
               </button>
             </div>
           </>
         )}
 
-        {/* Wallet stack */}
+        {/* Card list */}
         {loading ? (
           <div className="room__empty">Loading…</div>
         ) : visible.length === 0 && accounts.length === 0 ? (
@@ -178,44 +175,30 @@ export default function AccountsPage() {
               No {filterType} accounts.
             </p>
           </div>
-        ) : (
-          <div
-            className={
-              viewMode === 'stack' ? 'accounts-stack'
-              : viewMode === 'tile' ? 'accounts-tiles'
-              : 'accounts-grid'
-            }
-            onClick={(e) => e.stopPropagation()}
-          >
+        ) : viewMode === 'wallet' ? (
+          <div className="accounts-stack" onClick={(e) => e.stopPropagation()}>
             {visible.map((acc) => (
-              viewMode === 'tile' ? (
-                <WalletTile
-                  key={acc.id}
-                  account={acc}
-                  onSelect={(a) => setModal(a)}
-                />
-              ) : viewMode === 'stack' ? (
-                <AccountCard
-                  key={acc.id}
-                  account={acc}
-                  isFocused={focusedId === acc.id}
-                  isFlipped={flippedId === acc.id}
-                  onClick={handleCardClick}
-                  onEdit={(a) => setModal(a)}
-                  onDelete={(id) => setConfirmDelete(id)}
-                />
-              ) : (
-                /* grid mode — still uses AccountCard but in grid container */
-                <AccountCard
-                  key={acc.id}
-                  account={acc}
-                  isFocused={false}
-                  isFlipped={false}
-                  onClick={() => setModal(acc)}
-                  onEdit={(a) => setModal(a)}
-                  onDelete={(id) => setConfirmDelete(id)}
-                />
-              )
+              <AccountCard
+                key={acc.id}
+                account={acc}
+                isFocused={focusedId === acc.id}
+                isFlipped={flippedId === acc.id}
+                onClick={handleCardClick}
+                onEdit={(a) => setModal(a)}
+                onDelete={(id) => setConfirmDelete(id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="accounts-tiles" onClick={(e) => e.stopPropagation()}>
+            {visible.map((acc) => (
+              <WalletTile
+                key={acc.id}
+                account={acc}
+                onOpen={(a) => setDetailAccount(a)}
+                onEdit={(a) => setModal(a)}
+                onDelete={(id) => setConfirmDelete(id)}
+              />
             ))}
           </div>
         )}
@@ -227,6 +210,16 @@ export default function AccountsPage() {
       </main>
 
       <BottomNav />
+
+      {/* Tile detail drawer */}
+      {detailAccount && (
+        <AccountDetailDrawer
+          account={detailAccount}
+          onEdit={(a) => { setDetailAccount(null); setModal(a) }}
+          onDelete={(id) => { setDetailAccount(null); setConfirmDelete(id) }}
+          onClose={() => setDetailAccount(null)}
+        />
+      )}
 
       {/* Add / Edit modal */}
       {modal !== null && (
