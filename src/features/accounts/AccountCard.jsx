@@ -43,15 +43,16 @@ function buildCardStyle(skin) {
  * Bank name/logo lives on the back so the front stays clean over any card art.
  *
  * @param {{
- *   account:   import('@/store/accountsStore').Account,
- *   isFocused: boolean,
- *   isFlipped: boolean,
- *   onClick:   (id: string) => void,
- *   onEdit:    (account: import('@/store/accountsStore').Account) => void,
- *   onDelete:  (id: string) => void,
+ *   account:      import('@/store/accountsStore').Account,
+ *   isFocused:    boolean,
+ *   isFlipped:    boolean,
+ *   onClick:      (id: string) => void,
+ *   onEdit:       (account: import('@/store/accountsStore').Account) => void,
+ *   onDelete:     (id: string) => void,
+ *   onOpenDrawer: (account: import('@/store/accountsStore').Account) => void,
  * }} props
  */
-export default function AccountCard({ account, isFocused, isFlipped, onClick, onEdit, onDelete }) {
+export default function AccountCard({ account, isFocused, isFlipped, onClick, onEdit, onDelete, onOpenDrawer }) {
   const { format }                  = useFormatCurrency()
   const skin                        = getSkin(account.skinId)
   const [imgFailed, setImgFailed]   = useState(false)
@@ -118,10 +119,10 @@ export default function AccountCard({ account, isFocused, isFlipped, onClick, on
           <span className="card-front__flip-hint">tap again to flip ↺</span>
         </div>
 
-        {/* ── BACK ── */}
-        <div className="card-back" onClick={(e) => e.stopPropagation()}>
+        {/* ── BACK ── tapping the back flips it back to front */}
+        <div className="card-back" onClick={() => onClick(account.id)}>
 
-          {/* Header: bank identity + edit/delete */}
+          {/* Header: account name + edit/delete */}
           <div className="card-back__header">
             <div className="card-back__bank">
               <span className="card-back__account-name">{account.name}</span>
@@ -142,24 +143,33 @@ export default function AccountCard({ account, isFocused, isFlipped, onClick, on
             </div>
           </div>
 
-          {/* Two-section body */}
-          <div className="card-back__body">
-
-            {/* Section 1 — Transaction History */}
-            <div className="card-back__section">
-              <p className="card-back__section-label">Recent</p>
-              <p className="card-back__empty">No transactions yet.</p>
-            </div>
-
-            {/* Divider */}
-            <div className="card-back__divider" />
-
-            {/* Section 2 — Savings */}
-            <div className="card-back__section">
-              <p className="card-back__section-label">Savings</p>
-              <p className="card-back__empty">No goals linked.</p>
-            </div>
-
+          {/* Clicking the body opens the drawer. stopPropagation prevents the card from flipping back. */}
+          <div
+            className="card-back__body"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onOpenDrawer) onOpenDrawer(account)
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            {account.subAccounts && account.subAccounts.length > 0 ? (
+              <div className="card-back__section">
+                <p className="card-back__section-label">Sub-accounts (Tap for details)</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                  {account.subAccounts.map((sub, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
+                      <span style={{ opacity: 0.9 }}>{sub.name}</span>
+                      <span style={{ fontWeight: '500' }}>{format(sub.balance)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="card-back__section">
+                <p className="card-back__section-label">Recent Transactions</p>
+                <p className="card-back__empty">Tap to view full history.</p>
+              </div>
+            )}
           </div>
         </div>
 

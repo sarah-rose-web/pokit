@@ -8,8 +8,16 @@ import {
 } from '@/firebase/firestore'
 
 /**
+ * @typedef {Object} SubAccount
+ * @property {string} id
+ * @property {string} name
+ * @property {number} balance
+ */
+
+/**
  * @typedef {Object} Account
  * @property {string}  id
+ * @property {SubAccount[]} [subAccounts]
  * @property {string}  name
  * @property {'cash'|'bank'|'credit'|'ewallet'} type
  * @property {number}  balance

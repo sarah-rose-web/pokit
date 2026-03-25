@@ -186,6 +186,7 @@ export default function AccountsPage() {
                 onClick={handleCardClick}
                 onEdit={(a) => setModal(a)}
                 onDelete={(id) => setConfirmDelete(id)}
+                onOpenDrawer={(a) => setDetailAccount(a)}
               />
             ))}
           </div>

@@ -161,16 +161,11 @@ function Contactless() {
   )
 }
 
-const LIGHT_BG_SKINS = new Set(['generic-light', 'generic-gold'])
-
 /** @param {{ account: import('@/store/accountsStore').Account }} props */
 function StaticCard({ account }) {
   const { format } = useFormatCurrency()
   const skin = getSkin(account.skinId)
   const showChip = account.type === 'bank' || account.type === 'credit'
-  const logoClass = LIGHT_BG_SKINS.has(account.skinId)
-    ? 'card-face__logo card-face__logo--dark'
-    : 'card-face__logo'
 
   return (
     <div
@@ -178,20 +173,10 @@ function StaticCard({ account }) {
       style={{ background: skin.colors.bg, color: skin.colors.text }}
     >
       <div className="card-face__overlay" />
-      {skin.logoUrl && (
-        <img src={skin.logoUrl} alt="" className="card-face__watermark" aria-hidden="true" />
-      )}
 
       <div className="card-face__top">
         <div className="card-face__logo-area">
-          {skin.logoUrl && (
-            <img
-              src={skin.logoUrl}
-              alt={skin.name}
-              className={logoClass}
-              onError={(e) => { e.currentTarget.style.display = 'none' }}
-            />
-          )}
+          <span style={{ fontWeight: '600', fontSize: '1.1rem' }}>{account.name}</span>
         </div>
       </div>
 

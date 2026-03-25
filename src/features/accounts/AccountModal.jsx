@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { nanoid } from 'nanoid'
 import BankSelectorDropdown from './BankSelectorDropdown'
 
 const ACCOUNT_TYPES = [
@@ -7,6 +8,9 @@ const ACCOUNT_TYPES = [
   { value: 'ewallet', label: 'E-wallet' },
   { value: 'credit',  label: 'Credit' },
 ]
+
+/** Default blank savings row */
+const blankSavings = () => ({ id: nanoid(), name: '', balance: '' })
 
 /**
  * @param {{
@@ -19,11 +23,16 @@ const ACCOUNT_TYPES = [
 export default function AccountModal({ account, onSave, onClose, saving }) {
   const isEdit = !!account
 
-  const [name,     setName]     = useState(account?.name     ?? '')
-  const [type,     setType]     = useState(account?.type     ?? 'bank')
-  const [balance,  setBalance]  = useState(account?.balance  ?? '')
-  const [lastFour, setLastFour] = useState(account?.lastFour ?? '')
-  const [skinId,   setSkinId]   = useState(account?.skinId   ?? null)
+  const [name,         setName]         = useState(account?.name     ?? '')
+  const [type,         setType]         = useState(account?.type     ?? 'bank')
+  const [balance,      setBalance]      = useState(account?.balance  ?? '')
+  const [lastFour,     setLastFour]     = useState(account?.lastFour ?? '')
+  const [skinId,       setSkinId]       = useState(account?.skinId   ?? null)
+
+  // Sub-accounts (savings) state
+  const [subAccounts,  setSubAccounts]  = useState(
+    () => account?.subAccounts?.map(sa => ({ ...sa, balance: String(sa.balance) })) ?? []
+  )
 
   useEffect(() => {
     if (account) {
@@ -32,6 +41,9 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
       setBalance(account.balance ?? '')
       setLastFour(account.lastFour ?? '')
       setSkinId(account.skinId ?? null)
+      setSubAccounts(
+        account.subAccounts?.map(sa => ({ ...sa, balance: String(sa.balance) })) ?? []
+      )
     }
   }, [account])
 
@@ -42,19 +54,47 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
     if (baseType) setType(baseType)
   }
 
+  /** Add a blank savings row */
+  function addSavingsRow() {
+    setSubAccounts((prev) => [...prev, blankSavings()])
+  }
+
+  /** Update a field on a savings row */
+  function updateSavingsRow(id, field, value) {
+    setSubAccounts((prev) =>
+      prev.map((sa) => sa.id === id ? { ...sa, [field]: value } : sa)
+    )
+  }
+
+  /** Remove a savings row */
+  function removeSavingsRow(id) {
+    setSubAccounts((prev) => prev.filter((sa) => sa.id !== id))
+  }
+
   function handleSubmit(e) {
     e.preventDefault()
     if (!name.trim()) return
+
+    const cleanedSubs = subAccounts
+      .filter((sa) => sa.name.trim())
+      .map((sa) => ({
+        id:      sa.id,
+        name:    sa.name.trim(),
+        balance: parseFloat(sa.balance) || 0,
+      }))
+
     onSave({
-      name:     name.trim(),
+      name:        name.trim(),
       type,
-      balance:  parseFloat(balance) || 0,
-      lastFour: lastFour.trim() || null,
+      balance:     parseFloat(balance) || 0,
+      lastFour:    lastFour.trim() || null,
       skinId,
+      subAccounts: cleanedSubs.length > 0 ? cleanedSubs : null,
     })
   }
 
-  const showLastFour = type === 'credit' || type === 'bank'
+  const showLastFour   = type === 'credit' || type === 'bank'
+  const showSubAccounts = type === 'bank' || type === 'ewallet'
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -129,6 +169,61 @@ export default function AccountModal({ account, onSave, onClose, saving }) {
                 inputMode="numeric"
               />
             </label>
+          )}
+
+          {/* ── Savings sub-accounts (bank / e-wallet only) ── */}
+          {showSubAccounts && (
+            <div className="field">
+              <div className="sub-accounts__header">
+                <span className="field__label" style={{ margin: 0 }}>Savings accounts</span>
+                <button
+                  type="button"
+                  className="sub-accounts__add-btn"
+                  onClick={addSavingsRow}
+                >
+                  + Add savings
+                </button>
+              </div>
+
+              {subAccounts.length > 0 && (
+                <div className="sub-accounts__list">
+                  {subAccounts.map((sa) => (
+                    <div key={sa.id} className="sub-account-row">
+                      <input
+                        className="input sub-account-row__name"
+                        placeholder="e.g. Emergency Fund"
+                        value={sa.name}
+                        onChange={(e) => updateSavingsRow(sa.id, 'name', e.target.value)}
+                      />
+                      <input
+                        className="input sub-account-row__balance"
+                        type="number"
+                        placeholder="0.00"
+                        value={sa.balance}
+                        onChange={(e) => updateSavingsRow(sa.id, 'balance', e.target.value)}
+                        min="0"
+                        step="0.01"
+                        inputMode="decimal"
+                      />
+                      <button
+                        type="button"
+                        className="sub-account-row__remove"
+                        onClick={() => removeSavingsRow(sa.id)}
+                        aria-label="Remove"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {subAccounts.length === 0 && (
+                <p className="sub-accounts__empty">
+                  Tap "+ Add savings" to link a savings account to this {type === 'bank' ? 'bank' : 'wallet'}.
+                </p>
+              )}
+            </div>
           )}
 
           <button
